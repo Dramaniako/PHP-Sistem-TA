@@ -2,7 +2,12 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    {{-- 1. ADD THIS: Necessary for Laravel Security --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    
     <title>Sistem TA</title>
+
+    {{-- 2. RECOMMENDATION: Eventually switch this CDN to @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
