@@ -1,36 +1,45 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    {{-- 1. ADD THIS: Necessary for Laravel Security --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    
+    <title>Sistem TA</title>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    {{-- 2. RECOMMENDATION: Eventually switch this CDN to @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+    {{-- HEADER GLOBAL --}}
+    <div class="bg-neutral-900 text-white px-10 py-6 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-neutral-700 rounded-xl flex items-center justify-center">
+                🛡️
+            </div>
+            <div>
+                <p class="text-sm opacity-80">FMIPA</p>
+                <p class="text-xl font-semibold">Universitas Udayana</p>
+                <span class="inline-block mt-1 text-xs bg-neutral-700 px-3 py-1 rounded-full">
+                    Laporan & Dokumentasi
+                </span>
+            </div>
         </div>
-    </body>
+
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <p class="font-semibold">I Gusti Contoh</p>
+                <p class="text-xs opacity-70">TATA USAHA</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-bold">
+                G
+            </div>
+        </div>
+    </div>
+
+    {{-- ISI HALAMAN --}}
+    @yield('content')
+
+</body>
 </html>
