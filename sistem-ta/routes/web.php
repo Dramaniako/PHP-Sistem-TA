@@ -86,13 +86,33 @@ Route::middleware('auth')->group(function () {
         Route::get('/penetapan/{id}/proses', [App\Http\Controllers\Koordinator\PenetapanController::class, 'edit'])->name('penetapan.edit');
         Route::put('/penetapan/{id}', [App\Http\Controllers\Koordinator\PenetapanController::class, 'update'])->name('penetapan.update');
 
-        // ... route approval lainnya ...
+        // Di dalam group koordinator...
+
+// Halaman Detail
+Route::get('/penetapan/{id}/detail', [PenetapanController::class, 'show'])->name('penetapan.show');
+
+// Proses Simpan Review/Keputusan
+Route::put('/penetapan/{id}/keputusan', [PenetapanController::class, 'updateKeputusan'])->name('penetapan.keputusan');
+
+// Proses Download File
+Route::get('/penetapan/{id}/download', [PenetapanController::class, 'download'])->name('penetapan.download');
     });
 
     // Route untuk Dosen (Monitoring)
     Route::middleware(['role:dosen'])->prefix('dosen')->name('dosen.')->group(function() {
         Route::get('/monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
     });
+});
+
+// Di dalam group middleware role:dosen
+Route::middleware(['role:dosen'])->prefix('dosen')->name('dosen.')->group(function() {
+    
+    // ... route dosen lainnya ...
+
+    // FITUR BARU: Request Kesediaan
+    Route::get('/requests', [App\Http\Controllers\Dosen\RequestController::class, 'index'])->name('request.index');
+    Route::post('/requests/{id}/respond', [App\Http\Controllers\Dosen\RequestController::class, 'respond'])->name('request.respond');
+
 });
 
 require __DIR__.'/auth.php';

@@ -49,22 +49,31 @@
                                     <td class="px-5 py-4 text-sm text-gray-600">{{ $p->pembimbing->name ?? '-' }}</td>
                                     <td class="px-5 py-4 text-sm text-gray-600">{{ $p->penguji->name ?? '-' }}</td>
                                     <td class="px-5 py-4 text-sm text-center">
-                                        
-                                        {{-- LOGIKA TOMBOL PROSES --}}
-                                        @if($p->dosen_pembimbing_id == null)
-                                            {{-- Jika Belum Ada Dosen -> Muncul Tombol Proses ke halaman EDIT --}}
-                                            {{-- Pastikan route ini mengarah ke .edit --}}
-                                            <a href="{{ route('koordinator.penetapan.edit', $p->id) }}" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded text-xs">
-                                                ⚙️ Tetapkan Dosen
+                                        <div class="flex justify-center items-center gap-2">
+                                            
+                                            {{-- 1. TOMBOL DETAIL (BARU: Tambahkan ini) --}}
+                                            {{-- Tombol ini muncul baik sudah ditetapkan maupun belum --}}
+                                            <a href="{{ route('koordinator.penetapan.show', $p->id) }}" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-1 px-3 rounded text-xs flex items-center" title="Lihat Detail Proposal">
+                                                👁️
                                             </a>
-                                        @else
-                                            <span class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full text-xs">
-                                                ✓ Selesai
-                                            </span>
-                                            {{-- Opsional: Tombol Edit Ulang --}}
-                                            <a href="{{ route('koordinator.penetapan.edit', $p->id) }}" class="text-xs text-blue-500 hover:underline block mt-1">Ubah</a>
-                                        @endif
 
+                                            {{-- 2. LOGIKA TOMBOL PROSES (YANG LAMA) --}}
+                                            @if($p->dosen_pembimbing_id == null)
+                                                {{-- Jika Belum Ada Dosen -> Tombol Kuning --}}
+                                                <a href="{{ route('koordinator.penetapan.edit', $p->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded text-xs">
+                                                    ⚙️ Tetapkan
+                                                </a>
+                                            @else
+                                                {{-- Jika Sudah Ada -> Teks Selesai + Link Ubah --}}
+                                                <div class="flex flex-col items-center">
+                                                    <span class="px-2 py-0.5 font-semibold leading-tight text-green-700 bg-green-100 rounded-full text-[10px] mb-1">
+                                                        ✓ Selesai
+                                                    </span>
+                                                    <a href="{{ route('koordinator.penetapan.edit', $p->id) }}" class="text-xs text-blue-500 hover:underline">Ubah</a>
+                                                </div>
+                                            @endif
+
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

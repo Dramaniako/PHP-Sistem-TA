@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}"> 
@@ -95,13 +96,31 @@
                     </a>
                 @endif
 
-                {{-- KHUSUS DOSEN (FITUR BARU) --}}
+                {{-- KHUSUS DOSEN --}}
                 @if(Auth::user()->role == 'dosen')
                     <div class="mt-4 mb-2 text-xs font-bold text-green-600 uppercase">Dosen</div>
 
-                    {{-- 1. Monitoring Bimbingan --}}
+                    {{-- 1. Monitoring Bimbingan (Yang sudah ada) --}}
                     <a href="{{ route('dosen.monitoring.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition">
                         <span>👀</span> <span class="font-medium">Monitoring Bimbingan</span>
+                    </a>
+
+                    {{-- 2. Permintaan Kesediaan (TAMBAHKAN INI) --}}
+                    {{-- Beri badge notifikasi jika ada request pending --}}
+                    @php
+                        $pendingCount = App\Models\DosenRequest::where('dosen_id', Auth::id())->where('status', 'pending')->count();
+                    @endphp
+                    
+                    <a href="{{ route('dosen.request.index') }}" class="flex items-center justify-between px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition">
+                        <div class="flex items-center gap-3">
+                            <span>📩</span> <span class="font-medium">Permintaan Masuk</span>
+                        </div>
+                        
+                        @if($pendingCount > 0)
+                            <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                                {{ $pendingCount }}
+                            </span>
+                        @endif
                     </a>
                 @endif
 
