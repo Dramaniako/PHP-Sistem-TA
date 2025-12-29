@@ -1,15 +1,23 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
+// --- 1. Import Controllers ---
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KoordinatorController;
-use App\Http\Controllers\TUController;
-// PENTING: Import Controller Sidang Mahasiswa yang baru dibuat
+
+// Mahasiswa
 use App\Http\Controllers\Mahasiswa\SidangMahasiswaController;
+use App\Http\Controllers\Mahasiswa\ProposalMahasiswaController;
+
+// Koordinator
+use App\Http\Controllers\Koordinator\PenetapanController;
+
+// Dosen
 use App\Http\Controllers\Dosen\SidangDosenController;
 use App\Http\Controllers\Dosen\MonitoringController;
-use App\Http\Controllers\Koordinator\PenetapanController;
-use App\Http\Controllers\DashboardController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Dosen\RequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,101 +25,99 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// --- 2. Public Route ---
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// --- 3. Authenticated Routes ---
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::middleware('auth')->group(function () {
+    // --- DASHBOARD ---
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // --- PROFILE ---
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-  
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // --- FITUR DOSEN/KAPRODI (Existing) ---
-    Route::get('/proposal', [SidangMahasiswaController::class, 'index'])->name('proposal.index');
-    Route::get('/monitoring', [SidangMahasiswaController::class, 'index'])->name('monitoring.index');
-
-    // --- AREA KHUSUS MAHASISWA ---
-    // Hanya user dengan role 'mahasiswa' yang bisa akses
-    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa')->group(function () {
+    // Menggunakan Route::controller agar lebih ringkas
+    Route::controller(ProfileController::class)->group(function () {
+        // PENTING: Tambahkan ini jika di navigasi ada link route('profile.index')
+        // Jika controller tidak punya method 'index', arahkan ke 'edit' atau buat method index.
+        Route::get('/profile/view', 'index')->name('profile.index'); 
         
+        // Halaman edit profil (biasanya jadi halaman utama profil)
+        Route::get('/profile', 'edit')->name('profile.edit');
+        Route::patch('/profile', 'update')->name('profile.update');
+        Route::delete('/profile', 'destroy')->name('profile.destroy');
+        
+    });
+
+
+    // ====================================================
+    // A. AREA MAHASISWA
+    // ====================================================
+    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+        
+        // 1. Proposal (Upload Judul)
+        Route::controller(ProposalMahasiswaController::class)->group(function() {
+            Route::get('/proposal/create', 'create')->name('proposal.create');
+            Route::post('/proposal', 'store')->name('proposal.store');
+            Route::get('/proposal/{id}/download', 'download')->name('proposal.download');
+        });
+
+        // 2. Jadwal Sidang Saya & Reschedule
         Route::controller(SidangMahasiswaController::class)->prefix('sidang')->name('sidang.')->group(function () {
             Route::get('/', 'index')->name('index'); 
             Route::post('/{id}/ajukan-perubahan', 'ajukanPerubahan')->name('reschedule');
         });
-
     });
 
 
-    // --- AREA KHUSUS KOORDINATOR ---
-    // Hanya user dengan role 'koordinator' yang bisa akses
+    // ====================================================
+    // B. AREA KOORDINATOR
+    // ====================================================
+    // Grup Utama Koordinator
     Route::middleware(['role:koordinator'])->prefix('koordinator')->name('koordinator.')->group(function() {
         
-        Route::get('/approval', [KoordinatorController::class, 'index'])->name('approval');
-        Route::post('/approval/{id}/approve', [KoordinatorController::class, 'approve'])->name('approve');
-        Route::post('/approval/{id}/reject', [KoordinatorController::class, 'reject'])->name('reject');
+        // 1. Approval Reschedule
+        Route::controller(KoordinatorController::class)->group(function() {
+            Route::get('/approval', 'index')->name('approval');
+            Route::post('/approval/{id}/approve', 'approve')->name('approve');
+            Route::post('/approval/{id}/reject', 'reject')->name('reject');
+        });
 
+        // 2. Penetapan Dosen (Pembimbing & Penguji)
+        Route::controller(PenetapanController::class)->prefix('penetapan')->name('penetapan.')->group(function() {
+            Route::get('/', 'index')->name('index');           // List
+            Route::get('/{id}/detail', 'show')->name('show');  // Detail
+            Route::get('/{id}/download', 'download')->name('download'); 
+            
+            Route::get('/{id}/proses', 'edit')->name('edit');  // Form Penetapan
+            Route::put('/{id}', 'update')->name('update');     // Proses Penetapan
+            Route::put('/{id}/keputusan', 'updateKeputusan')->name('keputusan');
+        });
     });
 
-    Route::middleware(['auth', 'role:koordinator'])->prefix('dosen')->name('dosen.')->group(function() {
-    
-        // Halaman Form Tambah Jadwal
+    // [KHUSUS] Buat Jadwal Sidang (Akses Koordinator, tapi Nama Route 'dosen.sidang...')
+    // Kita pisahkan dari grup di atas agar nama route-nya tidak kena prefix 'koordinator.'
+    Route::middleware(['role:koordinator'])->prefix('dosen')->name('dosen.')->group(function() {
         Route::get('/sidang/create', [SidangDosenController::class, 'create'])->name('sidang.create');
-        // Proses Simpan
         Route::post('/sidang/store', [SidangDosenController::class, 'store'])->name('sidang.store');
-
     });
 
-    // 1. Route Mahasiswa (Untuk Submit Judul)
-    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function() {
-        // ... route sidang sebelumnya ...
-        Route::get('/proposal/create', [App\Http\Controllers\Mahasiswa\ProposalMahasiswaController::class, 'create'])->name('proposal.create');
-        Route::post('/proposal', [App\Http\Controllers\Mahasiswa\ProposalMahasiswaController::class, 'store'])->name('proposal.store');
-    });
 
-    // 2. Route Koordinator (Update bagian Penetapan)
-    Route::middleware(['role:koordinator'])->prefix('koordinator')->name('koordinator.')->group(function() {
-        
-        // Penetapan sekarang pakai method EDIT dan UPDATE (bukan Create/Store lagi)
-        Route::get('/penetapan', [App\Http\Controllers\Koordinator\PenetapanController::class, 'index'])->name('penetapan.index');
-        
-        // URL terima ID Proposal: /penetapan/{id}/proses
-        Route::get('/penetapan/{id}/proses', [App\Http\Controllers\Koordinator\PenetapanController::class, 'edit'])->name('penetapan.edit');
-        Route::put('/penetapan/{id}', [App\Http\Controllers\Koordinator\PenetapanController::class, 'update'])->name('penetapan.update');
-
-        // Di dalam group koordinator...
-
-// Halaman Detail
-Route::get('/penetapan/{id}/detail', [PenetapanController::class, 'show'])->name('penetapan.show');
-
-// Proses Simpan Review/Keputusan
-Route::put('/penetapan/{id}/keputusan', [PenetapanController::class, 'updateKeputusan'])->name('penetapan.keputusan');
-
-// Proses Download File
-Route::get('/penetapan/{id}/download', [PenetapanController::class, 'download'])->name('penetapan.download');
-    });
-
-    // Route untuk Dosen (Monitoring)
+    // ====================================================
+    // C. AREA DOSEN
+    // ====================================================
     Route::middleware(['role:dosen'])->prefix('dosen')->name('dosen.')->group(function() {
+        
+        // 1. Monitoring Bimbingan
         Route::get('/monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+
+        // 2. Request Kesediaan (Terima/Tolak)
+        Route::controller(RequestController::class)->prefix('requests')->name('request.')->group(function() {
+            Route::get('/', 'index')->name('index');
+            Route::post('/{id}/respond', 'respond')->name('respond');
+        });
     });
-});
-
-// Di dalam group middleware role:dosen
-Route::middleware(['role:dosen'])->prefix('dosen')->name('dosen.')->group(function() {
-    
-    // ... route dosen lainnya ...
-
-    // FITUR BARU: Request Kesediaan
-    Route::get('/requests', [App\Http\Controllers\Dosen\RequestController::class, 'index'])->name('request.index');
-    Route::post('/requests/{id}/respond', [App\Http\Controllers\Dosen\RequestController::class, 'respond'])->name('request.respond');
 
 });
 

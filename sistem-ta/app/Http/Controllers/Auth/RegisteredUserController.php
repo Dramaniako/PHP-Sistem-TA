@@ -29,16 +29,21 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // 1. Tambahkan validasi untuk 'nim'
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'nim' => ['required', 'string', 'max:20', 'unique:users'], // <-- Cek NIM unik
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // 2. Masukkan 'nim' ke dalam proses create user
         $user = User::create([
             'name' => $request->name,
+            'nim' => $request->nim,       // <-- TAMBAHKAN BARIS INI
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'mahasiswa',        // Default role mahasiswa
         ]);
 
         event(new Registered($user));

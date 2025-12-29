@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Models\User;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,8 @@ class Proposal extends Model
         'dosen_penguji_id',
         'judul',
         'deskripsi',
-        'status',
+        'file_proposal',
+        'status'
     ];
 
     // Relasi ke Mahasiswa
@@ -25,7 +27,7 @@ class Proposal extends Model
     }
 
     // Relasi ke Dosen Pembimbing
-    public function pembimbing()
+    public function dosenPembimbing()
     {
         return $this->belongsTo(User::class, 'dosen_pembimbing_id');
     }

@@ -47,7 +47,7 @@
                                 <p class="text-[10px] text-gray-400">{{ $p->created_at->format('d M') }}</p>
                                 <span class="text-[10px] px-2 rounded-full 
                                     {{ $p->status == 'disetujui' ? 'bg-green-100 text-green-700' : 
-                                      ($p->status == 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
+                                     ($p->status == 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
                                     {{ ucfirst($p->status) }}
                                 </span>
                             </div>
@@ -76,7 +76,6 @@
                         </div>
                         <div>
                             <p class="text-xs font-bold text-gray-400 uppercase">Program Studi</p>
-                            {{-- Ambil dari kolom 'prodi' yang baru kita buat --}}
                             <p class="font-bold text-gray-800">{{ $proposal->mahasiswa->prodi ?? 'Informatika' }}</p>
                         </div>
                         <div>
@@ -91,31 +90,45 @@
                 </div>
             </div>
 
-            {{-- 4. DOWNLOAD PROPOSAL --}}
+            {{-- 4. DOWNLOAD PROPOSAL (LOGIKA FILE SUDAH DIGABUNGKAN DI SINI) --}}
             <div class="mb-8">
                 <h4 class="text-xs font-bold text-gray-400 uppercase mb-2"><i class="fas fa-bookmark mr-1"></i> Judul Proposal</h4>
                 <h2 class="text-xl font-bold text-gray-900 leading-relaxed mb-4">"{{ $proposal->judul }}"</h2>
 
-                <div class="border border-dashed border-gray-300 bg-gray-50 rounded-lg p-4 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-red-100 p-3 rounded-lg text-red-500">
-                            <i class="fas fa-file-pdf fa-lg"></i>
+                @if($proposal->file_proposal && Storage::disk('public')->exists($proposal->file_proposal))
+                    <div class="border border-gray-200 bg-white rounded-xl p-4 flex items-center justify-between hover:border-blue-400 transition shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-red-100 p-3 rounded-lg text-red-500">
+                                <i class="fas fa-file-pdf fa-2x"></i>
+                            </div>
+                            <div>
+                                {{-- Nama File Otomatis --}}
+                                <p class="font-bold text-gray-800 text-sm">
+                                    Proposal_TA_{{ $proposal->mahasiswa->nim }}.pdf
+                                </p>
+                                {{-- Size & Waktu --}}
+                                <p class="text-xs text-gray-500 mt-1">
+                                    {{ number_format(Storage::disk('public')->size($proposal->file_proposal) / 1024, 0) }} KB 
+                                    • Diunggah {{ $proposal->created_at->diffForHumans() }}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-bold text-gray-700 text-sm">Dokumen_Proposal.pdf</p>
-                            {{-- Cek apakah ada file --}}
-                            <p class="text-xs text-gray-400">
-                                {{ $proposal->file_path ? 'Tersedia untuk diunduh' : 'File belum diunggah mahasiswa' }}
-                            </p>
-                        </div>
+                        
+                        {{-- Tombol Download --}}
+                        <a href="{{ route('koordinator.penetapan.download', $proposal->id) }}" class="group flex flex-col items-center text-gray-400 hover:text-blue-600 transition">
+                            <div class="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center mb-1">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <span class="text-[10px] font-bold">Unduh</span>
+                        </a>
                     </div>
-                    
-                    {{-- Tombol Download --}}
-                    <a href="{{ route('koordinator.penetapan.download', $proposal->id) }}" class="text-gray-500 hover:text-blue-600 transition flex flex-col items-center">
-                        <i class="fas fa-download fa-lg"></i>
-                        <span class="text-[10px] mt-1">Unduh</span>
-                    </a>
-                </div>
+                @else
+                    <div class="border border-dashed border-red-200 bg-red-50 rounded-xl p-6 text-center">
+                        <div class="text-red-400 mb-2"><i class="fas fa-exclamation-circle fa-2x"></i></div>
+                        <p class="text-sm font-bold text-red-600">File dokumen tidak ditemukan</p>
+                        <p class="text-xs text-red-500">Mahasiswa belum mengunggah file atau file telah dihapus.</p>
+                    </div>
+                @endif
                 
                 {{-- Deskripsi --}}
                 <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-100">

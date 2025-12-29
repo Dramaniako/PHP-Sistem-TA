@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'role', // Pastikan ini ada
         'nim',  // TAMBAHKAN INI
+        'profile_photo_path'
     ];
 
     /**
@@ -47,4 +48,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getProfilePhotoUrlAttribute()
+{
+    return $this->profile_photo_path
+                ? asset('storage/' . $this->profile_photo_path)
+                : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=FFFFFF&background=111827&bold=true';
+}
+
+public function proposal() { return $this->hasOne(Proposal::class, 'mahasiswa_id'); }
 }

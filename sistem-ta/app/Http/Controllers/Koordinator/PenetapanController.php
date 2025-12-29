@@ -89,26 +89,27 @@ class PenetapanController extends Controller
         return redirect()->route('koordinator.penetapan.index')->with('success', 'Permintaan kesediaan telah dikirim ke Dosen terkait!');
     }
 
-    // Menampilkan Halaman Detail / Review
     public function show(Request $request, $id)
     {
-        // A. Ambil Proposal yang sedang dibuka (Detail Utama)
-        $proposal = Proposal::with('mahasiswa')->findOrFail($id);
+        // 1. Ambil Data Proposal Utama
+        $proposal = Proposal::with(['mahasiswa', 'dosenPembimbing'])->findOrFail($id);
 
-        // B. Logika Pencarian untuk Sidebar (List di Kiri)
-        $query = Proposal::with('mahasiswa')->latest();
+        // 2. Data Sidebar (List Proposal + Fitur Cari)
+        $search = $request->input('search');
+        $sidebarProposals = Proposal::with('mahasiswa')
+            ->when($search, function($query, $search) {
+                $query->whereHas('mahasiswa', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('nim', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('id', 'desc')
+            ->get();
 
-        if ($request->has('search_sidebar')) {
-            $search = $request->search_sidebar;
-            $query->whereHas('mahasiswa', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('nim', 'like', "%{$search}%");
-            });
-        }
+        // 3. Data Dosen (Untuk Dropdown Penetapan)
+        $dosens = User::where('role', 'dosen')->get();
 
-        $sidebarProposals = $query->get();
-
-        return view('koordinator.penetapan.detail', compact('proposal', 'sidebarProposals'));
+        return view('koordinator.penetapan.detail', compact('proposal', 'sidebarProposals', 'dosens', 'search'));
     }
 
     public function updateKeputusan(Request $request, $id)
@@ -136,14 +137,20 @@ class PenetapanController extends Controller
 
     public function download($id)
     {
-        $proposal = Proposal::findOrFail($id);
+        // Ambil data proposal beserta data mahasiswa
+        $proposal = Proposal::with('mahasiswa')->findOrFail($id);
 
-        // Cek apakah file ada (bisa dari storage asli atau dummy path)
-        if ($proposal->file_path && Storage::exists($proposal->file_path)) {
-            return Storage::download($proposal->file_path);
+        // Cek file di disk 'public' agar tidak error Metadata
+        if (!Storage::disk('public')->exists($proposal->file_proposal)) {
+            return back()->with('error', 'File fisik tidak ditemukan di server.');
         }
 
-        // Fallback jika file tidak ditemukan (karena data dummy)
-        return redirect()->back()->with('error', 'File dokumen fisik belum diunggah oleh mahasiswa.');
+        // Buat nama file baru yang rapi: "Proposal_TA_[NIM]_[Nama].pdf"
+        $cleanName = 'Proposal_TA_' . 
+                    $proposal->mahasiswa->nim . '_' . 
+                    str_replace(' ', '_', $proposal->mahasiswa->name) . '.pdf';
+
+        // Download dari disk 'public' dengan nama baru
+        return Storage::disk('public')->download($proposal->file_proposal, $cleanName);
     }
 }
