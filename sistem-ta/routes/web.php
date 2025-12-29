@@ -13,6 +13,7 @@ use App\Http\Controllers\Mahasiswa\ProposalMahasiswaController;
 
 // Koordinator
 use App\Http\Controllers\Koordinator\PenetapanController;
+use App\Http\Controllers\Koordinator\UserController;
 
 // Dosen
 use App\Http\Controllers\Dosen\SidangDosenController;
@@ -93,6 +94,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{id}/proses', 'edit')->name('edit');  // Form Penetapan
             Route::put('/{id}', 'update')->name('update');     // Proses Penetapan
             Route::put('/{id}/keputusan', 'updateKeputusan')->name('keputusan');
+        });
+
+        Route::controller(UserController::class)->group(function() {
+        Route::get('/users', 'index')->name('users.index');
+        Route::put('/users/{id}/update-role', 'updateRole')->name('users.update-role');
         });
     });
 

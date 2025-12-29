@@ -80,6 +80,11 @@
                 @if(Auth::user()->role == 'koordinator')
                     <div class="mt-4 mb-2 text-xs font-bold text-red-500 uppercase">Koordinator</div>
 
+                    {{-- MENU BARU: Daftar Pengguna --}}
+                    <a href="{{ route('koordinator.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition">
+                        <span>👥</span> <span class="font-medium">Daftar Pengguna</span>
+                    </a>
+
                     {{-- 1. Penetapan Dosen (Untuk Proposal Baru) --}}
                     <a href="{{ route('koordinator.penetapan.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition">
                         <span>📝</span> <span class="font-medium">Penetapan Dosen/TA</span>
