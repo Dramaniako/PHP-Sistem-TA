@@ -40,12 +40,13 @@
                 <p class="text-xs opacity-70 uppercase">{{ Auth::user()->role }}</p>
             </div>
             
-            {{-- 3. Ganti DIV jadi A agar bisa diklik --}}
-            <a href="{{ Route::has('profile.edit') ? route('profile.edit') : '#' }}" 
-               class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-bold text-white hover:bg-red-700 transition cursor-pointer">
+            {{-- 3. Foto Profil Navigasi --}}
+            <a href="{{ route('profile.index') }}" 
+                class="w-10 h-10 rounded-full border-2 border-white/20 hover:border-white transition overflow-hidden cursor-pointer">
                 
-                {{-- 4. Ambil Huruf Depan Nama User --}}
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                <img src="{{ Auth::user()->profile_photo_url }}" 
+                    alt="{{ Auth::user()->name }}" 
+                    class="w-full h-full object-cover">
             </a>
         </div>
     </div>
@@ -70,7 +71,7 @@
                 @if(Auth::user()->role == 'mahasiswa')
                     <div class="mt-4 mb-2 text-xs font-bold text-blue-500 uppercase">Mahasiswa</div>
                     
-                    <a href="{{ route('sidang.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition">
+                    <a href="{{ route('mahasiswa.sidang.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition">
                         <span>📅</span> <span class="font-medium">Jadwal Sidang Saya</span>
                     </a>
                 @endif

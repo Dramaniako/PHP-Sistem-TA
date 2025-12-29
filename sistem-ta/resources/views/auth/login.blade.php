@@ -1,57 +1,81 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Universitas Udayana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-center mt-4">
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-
-        <div class="flex items-center justify-start mt-4">
-            <span class="text-gray-600">Belum punya akun?</span>
-            <a href="{{ route('register') }}" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
-                Daftar sekarang
-            </a>
-        </div>
-
-        <div class="flex items-center justify-start mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-        </div>
+    {{-- KARTU MENGAMBANG --}}
+    <div class="flex w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
         
-    </form>
-</x-guest-layout>
+        {{-- BAGIAN KIRI (GAMBAR/LOG0) --}}
+        <div class="hidden md:flex w-1/2 bg-neutral-900 text-white flex-col justify-center items-center p-12 relative">
+            <div class="relative z-10 text-center">
+                <div class="w-24 h-24 bg-neutral-800 rounded-2xl mx-auto mb-6 flex items-center justify-center text-5xl shadow-lg border border-neutral-700">
+                    🛡️
+                </div>
+                <h2 class="text-3xl font-bold tracking-wider mb-2">SISTEM TA</h2>
+                <p class="text-gray-400 text-sm">Fakultas Matematika dan Ilmu Pengetahuan Alam</p>
+                <div class="mt-8 w-16 h-1 bg-blue-600 mx-auto rounded-full"></div>
+            </div>
+            {{-- Efek Pattern --}}
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#4b5563 1px, transparent 1px); background-size: 20px 20px;"></div>
+        </div>
+
+        {{-- BAGIAN KANAN (FORM) --}}
+        <div class="w-full md:w-1/2 p-8 md:p-12">
+            <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold text-gray-800">Selamat Datang Kembali!</h3>
+                <p class="text-gray-500 text-sm mt-2">Silakan masuk untuk mengakses akun Anda.</p>
+            </div>
+
+            @if ($errors->any())
+                <div class="mb-4 bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm border border-red-100">
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+                
+                <div class="mb-5">
+                    <label class="block text-gray-700 text-sm font-bold mb-2 ml-1">NIM / Email</label>
+                    <input type="text" name="email" value="{{ old('email') }}" required autofocus
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition outline-none"
+                        placeholder="Masukkan NIM atau Email">
+                </div>
+
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2 ml-1">
+                        <label class="text-gray-700 text-sm font-bold">Password</label>
+                        <a href="{{ route('password.request') }}" class="text-xs text-blue-600 hover:text-blue-800 hover:underline">Lupa Password?</a>
+                    </div>
+                    <input type="password" name="password" required
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition outline-none"
+                        placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="w-full bg-neutral-900 hover:bg-black text-white font-bold py-3.5 rounded-xl shadow-lg shadow-gray-300/50 transition duration-200 transform hover:-translate-y-0.5">
+                    Masuk Sekarang
+                </button>
+
+                <div class="mt-8 text-center">
+                    <p class="text-sm text-gray-500">Belum punya akun? 
+                        <a href="{{ route('register') }}" class="font-bold text-blue-600 hover:text-blue-800">Daftar disini</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
