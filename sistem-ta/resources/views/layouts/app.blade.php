@@ -74,6 +74,12 @@
                     <a href="{{ route('mahasiswa.sidang.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition">
                         <span>📅</span> <span class="font-medium">Jadwal Sidang Saya</span>
                     </a>
+
+                    <a href="{{ route('mahasiswa.proposal.status') }}" 
+                    class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i class="fas fa-info-circle w-5 text-center"></i>
+                        <span class="font-medium">Status Proposal</span>
+                    </a>
                 @endif
 
                 {{-- KHUSUS KOORDINATOR (ADMIN) --}}
@@ -127,6 +133,26 @@
                                 {{ $pendingCount }}
                             </span>
                         @endif
+                    </a>
+
+                    {{-- Menu 1: Bimbingan Saya (Mahasiswa yang dibimbing) --}}
+                    <a href="{{ route('dosen.bimbingan.index') }}" 
+                    class="flex items-center gap-3 px-4 py-3 mx-2 rounded-xl transition duration-200 
+                    {{ request()->routeIs('dosen.bimbingan.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                        <div class="w-5 text-center">
+                            <i class="fas fa-chalkboard-teacher {{ request()->routeIs('dosen.bimbingan.*') ? 'text-white' : 'text-gray-400' }}"></i>
+                        </div>
+                        <span class="font-medium">Bimbingan Saya</span>
+                    </a>
+
+                    {{-- Menu 2: Menguji (Mahasiswa yang diuji) --}}
+                    <a href="{{ route('dosen.penguji.index') }}" 
+                    class="flex items-center gap-3 px-4 py-3 mx-2 rounded-xl transition duration-200 
+                    {{ request()->routeIs('dosen.penguji.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                        <div class="w-5 text-center">
+                            <i class="fas fa-clipboard-check {{ request()->routeIs('dosen.penguji.*') ? 'text-white' : 'text-gray-400' }}"></i>
+                        </div>
+                        <span class="font-medium">Jadwal Menguji</span>
                     </a>
                 @endif
 
