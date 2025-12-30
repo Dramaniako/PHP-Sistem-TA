@@ -58,71 +58,74 @@
                 </div>
 
                 <hr class="border-gray-100 my-8">
-
-                {{-- FORMULIR KEPUTUSAN DOSEN --}}
-                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                    <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-4">
-                        <i class="fas fa-gavel mr-2"></i> Keputusan Pembimbing / Penguji
+                {{-- FORMULIR PENILAIAN DOSEN --}}
+                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm mt-8" x-data="{ mode: null }">
+                    <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-4 border-b pb-2">
+                        <i class="fas fa-gavel mr-2"></i> Form Penilaian Proposal
                     </h3>
 
-                    <form action="{{ route('dosen.proposal.keputusan', $proposal->id) }}" method="POST">
+                    <form action="{{ route('dosen.proposal.keputusan', $proposal->id) }}" method="POST"
+                          @submit.prevent="if (mode === 'tolak') { if (confirm('Apakah Anda yakin ingin menolak proposal ini secara permanen?')) $el.submit() } else { $el.submit() }">
                         @csrf
                         @method('PUT')
 
-                        {{-- Pilihan Status --}}
-                        <div class="space-y-3 mb-6">
-                            {{-- Setuju --}}
-                            <label class="flex items-center p-4 border bg-white rounded-xl cursor-pointer hover:border-green-500 transition has-[:checked]:border-green-500 has-[:checked]:bg-green-50 has-[:checked]:shadow-sm">
-                                <input type="radio" name="status" value="approved" class="peer hidden" {{ $proposal->status == 'disetujui' ? 'checked' : '' }}>
-                                <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-4">
-                                    <i class="fas fa-check"></i>
+                        {{-- Pilihan Mode: Penilaian vs Tolak --}}
+                        <div class="flex gap-4 mb-6">
+                            {{-- Opsi 1: Berikan Nilai --}}
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="keputusan" value="nilai" x-model="mode" class="peer hidden">
+                                <div class="p-4 rounded-xl border-2 text-center transition hover:bg-blue-50 peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700">
+                                    <div class="mb-2 text-2xl"><i class="fas fa-calculator"></i></div>
+                                    <div class="font-bold text-sm">Berikan Nilai</div>
+                                    <div class="text-[10px] text-gray-500">Nilai &gt; 75 Lulus, &le; 75 Revisi</div>
                                 </div>
-                                <div class="flex-1">
-                                    <span class="block font-bold text-gray-800">Setuju / Lanjut</span>
-                                    <span class="text-xs text-gray-500">Proposal layak dilanjutkan ke tahap berikutnya</span>
-                                </div>
-                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 peer-checked:bg-green-500 peer-checked:border-green-500 transition"></div>
                             </label>
 
-                            {{-- Revisi --}}
-                            <label class="flex items-center p-4 border bg-white rounded-xl cursor-pointer hover:border-yellow-500 transition has-[:checked]:border-yellow-500 has-[:checked]:bg-yellow-50 has-[:checked]:shadow-sm">
-                                <input type="radio" name="status" value="pending" class="peer hidden" {{ $proposal->status == 'revisi' ? 'checked' : '' }}>
-                                <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mr-4">
-                                    <i class="fas fa-pen"></i>
+                            {{-- Opsi 2: Tolak Proposal --}}
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="keputusan" value="tolak" x-model="mode" class="peer hidden">
+                                <div class="p-4 rounded-xl border-2 border-gray-100 text-center transition hover:bg-red-50 peer-checked:border-red-600 peer-checked:bg-red-50 peer-checked:text-red-700">
+                                    <div class="mb-2 text-2xl"><i class="fas fa-ban"></i></div>
+                                    <div class="font-bold text-sm">Tolak Proposal</div>
+                                    <div class="text-[10px] text-gray-500">Proposal tidak layak</div>
                                 </div>
-                                <div class="flex-1">
-                                    <span class="block font-bold text-gray-800">Perlu Revisi</span>
-                                    <span class="text-xs text-gray-500">Mahasiswa harus memperbaiki proposal</span>
-                                </div>
-                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 peer-checked:bg-yellow-500 peer-checked:border-yellow-500 transition"></div>
-                            </label>
-
-                            {{-- Tolak --}}
-                            <label class="flex items-center p-4 border bg-white rounded-xl cursor-pointer hover:border-red-500 transition has-[:checked]:border-red-500 has-[:checked]:bg-red-50 has-[:checked]:shadow-sm">
-                                <input type="radio" name="status" value="rejected" class="peer hidden" {{ $proposal->status == 'ditolak' ? 'checked' : '' }}>
-                                <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4">
-                                    <i class="fas fa-times"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <span class="block font-bold text-gray-800">Tolak Proposal</span>
-                                    <span class="text-xs text-gray-500">Judul/Topik harus diganti total</span>
-                                </div>
-                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 peer-checked:bg-red-500 peer-checked:border-red-500 transition"></div>
                             </label>
                         </div>
 
-                        {{-- Input Komentar --}}
-                        <div class="mb-6">
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Catatan / Masukan Revisi</label>
+                        {{-- INPUT NILAI (Hanya muncul jika mode == nilai) --}}
+                        <div x-show="mode === 'nilai'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" class="mb-6 bg-blue-50 p-6 rounded-xl border border-blue-100">
+                            <label class="block text-sm font-bold text-blue-800 mb-2">Masukkan Nilai (0 - 100)</label>
+                            <div class="relative">
+                                <input type="number" name="nilai" min="0" max="100" 
+                                    class="w-full text-3xl font-bold text-center border-2 border-blue-200 rounded-xl p-3 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-300" 
+                                    placeholder="0" :required="mode === 'nilai'">
+                                <div class="text-center mt-2 text-xs font-medium text-blue-600">
+                                    *Sistem otomatis menentukan Lulus/Revisi berdasarkan nilai ini.
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- PESAN PERINGATAN (Hanya muncul jika mode == tolak) --}}
+                        <div x-show="mode === 'tolak'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" class="mb-6 bg-red-50 p-4 rounded-xl border border-red-100 flex items-start gap-3">
+                            <i class="fas fa-exclamation-triangle text-red-500 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-red-700 text-sm">Perhatian</h4>
+                                <p class="text-xs text-red-600">Anda akan menolak proposal ini secara permanen. Tombol simpan akan memunculkan konfirmasi akhir.</p>
+                            </div>
+                        </div>
+
+                        {{-- Input Komentar (Hanya muncul jika salah satu mode dipilih) --}}
+                        <div class="mb-6" x-show="mode !== null" x-cloak x-transition>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Catatan / Masukan</label>
                             <textarea name="komentar" rows="4" 
                                 class="w-full border-gray-300 rounded-xl text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
-                                placeholder="Tuliskan detail revisi yang harus dilakukan mahasiswa...">{{ $proposal->komentar }}</textarea>
+                                placeholder="Berikan alasan nilai atau catatan perbaikan..." :required="mode !== null">{{ $proposal->komentar }}</textarea>
                         </div>
 
-                        {{-- Tombol Simpan --}}
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-slate-800 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg transform hover:-translate-y-0.5 transition flex items-center gap-2">
-                                <i class="fas fa-save"></i> Simpan Keputusan
+                        {{-- Tombol Simpan (Muncul jika mode dipilih) --}}
+                        <div class="flex justify-end" x-show="mode !== null" x-cloak x-transition>
+                            <button type="submit" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-black transition transform active:scale-95 flex items-center gap-2">
+                                <i class="fas fa-save"></i> Simpan Penilaian
                             </button>
                         </div>
                     </form>

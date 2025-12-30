@@ -51,29 +51,45 @@ class DosenProposalController extends Controller
     {
         // 1. Validasi
         $request->validate([
-            'status'   => 'required|in:approved,pending,rejected', // Inggris (dari Form)
-            'komentar' => 'nullable|string'
+            'keputusan' => 'required|in:nilai,tolak', // Pilihan: Beri Nilai atau Tolak Langsung
+            'nilai'     => 'nullable|numeric|min:0|max:100', // Wajib diisi jika keputusan == 'nilai'
+            'komentar'  => 'nullable|string'
         ]);
 
         $proposal = Proposal::findOrFail($id);
 
-        // 2. Keamanan: Pastikan yang mengubah adalah Dosen yang bersangkutan
+        // Pastikan dosen berhak
         if ($proposal->dosen_pembimbing_id != auth()->id() && $proposal->dosen_penguji_id != auth()->id()) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mengubah proposal ini.');
+            abort(403, 'Akses ditolak.');
         }
 
-        // 3. Mapping Status (Inggris -> Indonesia) sesuai database
+        // 2. LOGIKA PENENTUAN STATUS
         $statusDb = 'pending';
-        if ($request->status == 'approved') $statusDb = 'disetujui';
-        if ($request->status == 'pending')  $statusDb = 'revisi';
-        if ($request->status == 'rejected') $statusDb = 'ditolak';
+        $nilaiMasuk = null;
 
-        // 4. Update Database
+        if ($request->keputusan == 'tolak') {
+            // Jika Dosen memilih opsi TOLAK
+            $statusDb = 'ditolak';
+            $nilaiMasuk = 0; // Atau null, tergantung kebijakan (di sini saya set 0)
+        } else {
+            // Jika Dosen memberikan NILAI
+            $nilaiMasuk = $request->nilai;
+            
+            // Logika > 75 Lulus, Selebihnya Revisi
+            if ($nilaiMasuk > 75) {
+                $statusDb = 'disetujui';
+            } else {
+                $statusDb = 'revisi';
+            }
+        }
+
+        // 3. Update Database
         $proposal->update([
             'status'   => $statusDb,
+            'nilai'    => $nilaiMasuk,
             'komentar' => $request->komentar
         ]);
 
-        return back()->with('success', 'Status proposal berhasil diperbarui!');
+        return back()->with('success', 'Penilaian proposal berhasil disimpan!');
     }
 }
