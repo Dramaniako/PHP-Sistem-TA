@@ -67,6 +67,13 @@
                             @enderror
                         </div>
 
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Upload KHS Terakhir (PDF)</label>
+                            <input type="file" name="file_khs" accept=".pdf" required
+                                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">*Sebagai bukti pemenuhan SKS.</p>
+                        </div>
+
                         <div class="flex items-center justify-end">
                             <a href="{{ route('mahasiswa.sidang.index') }}" class="text-gray-500 hover:text-gray-700 font-bold py-2 px-4 rounded mr-2">
                                 Batal

@@ -59,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // 1. Proposal (Upload Judul)
         Route::controller(ProposalMahasiswaController::class)->group(function() {
+            Route::get('/proposal/status', 'index')->name('proposal.status');
             Route::get('/proposal/create', 'create')->name('proposal.create');
             Route::post('/proposal', 'store')->name('proposal.store');
             Route::get('/proposal/{id}/download', 'download')->name('proposal.download');
@@ -122,6 +123,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::controller(RequestController::class)->prefix('requests')->name('request.')->group(function() {
             Route::get('/', 'index')->name('index');
             Route::post('/{id}/respond', 'respond')->name('respond');
+        });
+
+        Route::controller(App\Http\Controllers\Dosen\DosenProposalController::class)->group(function() {
+            // Menu Bimbingan
+            Route::get('/bimbingan', 'indexBimbingan')->name('bimbingan.index');
+            
+            // Menu Menguji
+            Route::get('/penguji', 'indexPenguji')->name('penguji.index');
+            
+            // Detail Proposal
+            Route::get('/proposal/{id}', 'show')->name('proposal.show');
+
+            Route::put('/proposal/{id}/keputusan', 'updateKeputusan')->name('proposal.keputusan');
         });
     });
 

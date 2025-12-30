@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Storage; // Jangan lupa import ini
 
 class ProposalMahasiswaController extends Controller
 {
+    public function index()
+    {
+        // Ambil proposal milik mahasiswa yang sedang login
+        $proposal = Proposal::with('dosenPembimbing')
+                    ->where('mahasiswa_id', auth()->id())
+                    ->latest() // Ambil yang paling baru diajukan
+                    ->first();
+
+        return view('mahasiswa.proposal.status', compact('proposal'));
+    }
     // Form Pengajuan Judul
     public function create()
     {
@@ -23,55 +33,49 @@ class ProposalMahasiswaController extends Controller
     }
 
     public function store(Request $request)
-{
-    // 1. Validasi
-    $request->validate([
-        'judul' => 'required|string|max:255',
-        'deskripsi' => 'required|string',
-        // Validasi File: Wajib, harus PDF, max 5MB (5120 KB)
-        'file_proposal' => 'required|file|mimes:pdf|max:5120', 
-    ]);
+    {
+        $request->validate([
+            'judul'         => 'required|string|max:255',
+            'deskripsi'     => 'required|string',
+            'file_proposal' => 'required|mimes:pdf|max:2048',
+            'file_khs'      => 'required|mimes:pdf|max:2048', // <--- Wajib Upload KHS
+        ]);
 
-    // 2. Proses Upload File
-    if ($request->hasFile('file_proposal')) {
-        // Simpan ke folder 'storage/app/public/proposals'
-        // 'public' adalah nama disk (agar bisa diakses url-nya nanti)
-        $filePath = $request->file('file_proposal')->store('proposals', 'public');
-    }
-
-    // 3. Simpan ke Database
-    \App\Models\Proposal::create([
-        // UBAH 'user_id' MENJADI 'mahasiswa_id'
-        'mahasiswa_id' => auth()->id(), 
+        // Upload File Proposal
+        $pathProposal = $request->file('file_proposal')->store('proposals', 'public');
         
-        'judul' => $request->judul,
-        'deskripsi' => $request->deskripsi,
-        'file_proposal' => $filePath,
-        'status' => 'pending', 
-    ]);
+        // Upload File KHS
+        $pathKhs = $request->file('file_khs')->store('khs', 'public');
 
-    // 4. Redirect dengan pesan sukses
-    return redirect()->route('mahasiswa.sidang.index')
-        ->with('success', 'Proposal berhasil diajukan!');
-}
+        Proposal::create([
+            'mahasiswa_id'  => auth()->id(),
+            'judul'         => $request->judul,
+            'deskripsi'     => $request->deskripsi,
+            'file_proposal' => $pathProposal,
+            'file_khs'      => $pathKhs, // <--- Simpan Path KHS
+            'status'        => 'pending',
+        ]);
 
-public function download($id)
-{
-    $proposal = Proposal::findOrFail($id);
-
-    // Keamanan: Pastikan yang download adalah pemilik proposal
-    if ($proposal->mahasiswa_id != auth()->id()) {
-        abort(403, 'Anda tidak berhak mengunduh dokumen ini.');
+        return redirect()->route('mahasiswa.sidang.index')->with('success', 'Proposal dan KHS berhasil diajukan!');
     }
 
-    // Cek keberadaan file
-    if (!Storage::disk('public')->exists($proposal->file_proposal)) {
-        return back()->with('error', 'File tidak ditemukan.');
+    public function download($id)
+    {
+        $proposal = Proposal::findOrFail($id);
+
+        // Keamanan: Pastikan yang download adalah pemilik proposal
+        if ($proposal->mahasiswa_id != auth()->id()) {
+            abort(403, 'Anda tidak berhak mengunduh dokumen ini.');
+        }
+
+        // Cek keberadaan file
+        if (!Storage::disk('public')->exists($proposal->file_proposal)) {
+            return back()->with('error', 'File tidak ditemukan.');
+        }
+
+        // Nama file rapi
+        $cleanName = 'Proposal_TA_' . auth()->user()->nim . '.pdf';
+
+        return Storage::disk('public')->download($proposal->file_proposal, $cleanName);
     }
-
-    // Nama file rapi
-    $cleanName = 'Proposal_TA_' . auth()->user()->nim . '.pdf';
-
-    return Storage::disk('public')->download($proposal->file_proposal, $cleanName);
-}
 }
