@@ -1,0 +1,298 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
+
+:root {
+    --bg-color: #F4F4F5;
+    --card-bg: #FFFFFF;
+    --text-primary: #222222;
+    --text-secondary: #71717A;
+    --header-bg: #18181B; /* Hitam Header */
+    --accent-green: #10B981; /* Warna Sukses */
+    --accent-yellow: #F59E0B; /* Warna Pending */
+    --accent-red: #EF4444; /* Warna Error */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Manrope', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- HEADER (Desktop & Mobile Sama) --- */
+.navbar {
+    background-color: var(--header-bg);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-placeholder {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-text h1 { font-size: 14px; opacity: 0.8; font-weight: 500; }
+.brand-text h2 { font-size: 18px; font-weight: 700; }
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--accent-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+}
+
+/* --- LAYOUT UTAMA --- */
+.main-container {
+    width: 100%;
+    max-width: 1000px; /* Batas lebar di Desktop */
+    margin: 0 auto;    /* Posisi Tengah */
+    padding: 20px;
+    flex: 1;
+}
+
+/* --- CARD COMPONENT --- */
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #E4E4E7;
+}
+
+/* --- STATUS ALERT --- */
+.alert {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.alert-warning { background: #FFFBEB; color: #B45309; border: 1px solid #FCD34D; }
+.alert-success { background: #ECFDF5; color: #047857; border: 1px solid #6EE7B7; }
+.alert-danger { background: #FEF2F2; color: #B91C1C; border: 1px solid #FCA5A5; }
+
+/* --- FORM STYLING --- */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #F4F4F5;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #52525B;
+    font-family: inherit;
+}
+
+/* --- DESKTOP VS MOBILE MAGIC (RESPONSIVE) --- */
+.row-desktop {
+    display: flex;
+    flex-direction: column; /* Default: Atas-Bawah (HP) */
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    /* Saat layar lebar (Laptop/Tablet), ubah jadi Kiri-Kanan */
+    .row-desktop {
+        flex-direction: row; 
+    }
+    .col-half {
+        flex: 1; /* Bagi dua kolom sama rata */
+    }
+}
+
+/* --- TOMBOL --- */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1;
+}
+
+.btn-primary { background: #222; color: white; }
+.btn-outline { background: #E4E4E7; color: #222; }
+.btn-danger { background: var(--accent-red); color: white; }
+
+/* --- TAMBAHAN HALAMAN CARI --- */
+
+/* 1. Search Bar Besar */
+.search-container {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #E4E4E7;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    color: #A1A1AA;
+}
+
+.search-input-large {
+    width: 100%;
+    padding: 16px 16px 16px 48px; /* Padding kiri besar untuk ikon */
+    background: #F4F4F5;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+}
+
+
+/* --- TAMPILAN TABEL (Updated Style: Grid Box) --- */
+.table-responsive {
+    display: none; /* Sembunyi di HP */
+    background: white;
+    margin-top: 20px;
+    /* Tidak perlu border-radius di container agar grid terlihat tajam */
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse; /* Agar garis menyatu (tidak double) */
+    border: 1px solid #000;    /* Garis luar hitam */
+}
+
+/* Header Tabel (Hitam Pekat) */
+.custom-table th {
+    background: #222222;
+    color: white;
+    padding: 14px;
+    text-align: center; /* Semua judul kolom rata tengah */
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #444; /* Garis pemisah di header */
+}
+
+/* Isi Tabel (Grid) */
+.custom-table td {
+    padding: 12px 16px;
+    border: 1px solid #A1A1AA; /* Garis grid abu-abu tegas */
+    font-size: 14px;
+    color: #222;
+    vertical-align: middle;
+}
+
+/* Pengaturan Perataan (Alignment) Per Kolom */
+.custom-table td:nth-child(2) { text-align: center; } /* Kolom NIM Tengah */
+.custom-table td:nth-child(4) { text-align: center; } /* Kolom Aksi Tengah */
+
+/* Tombol Detail (Bentuk Kapsul Hitam) */
+.btn-detail {
+    background-color: #222222;
+    color: white;
+    padding: 6px 24px;      /* Padding agar lonjong */
+    border-radius: 50px;    /* Radius besar agar jadi kapsul */
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+}
+
+.btn-detail:hover {
+    background-color: #444; /* Efek hover sedikit terang */
+}
+
+/* MEDIA QUERY (Tetap sama) */
+@media (min-width: 768px) {
+    .table-responsive { display: block; }
+    .mobile-list-view { display: none; }
+}
+
+/* 3. Tampilan LIST (Khusus Mobile) */
+.mobile-list-view {
+    display: flex; /* Muncul di HP */
+    flex-direction: column;
+    gap: 16px;
+}
+
+.student-card {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #E4E4E7;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.student-card-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.label-muted { color: #71717A; font-size: 12px; }
+
+/* 4. MEDIA QUERY (Pemisah Logika Desktop vs Mobile) */
+@media (min-width: 768px) {
+    .table-responsive { display: block; } /* Tampilkan Tabel di Desktop */
+    .mobile-list-view { display: none; }  /* Sembunyikan List di Desktop */
+}

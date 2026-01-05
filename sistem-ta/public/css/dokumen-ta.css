@@ -1,0 +1,646 @@
+.dokumen-administrasi {
+  background-color: #f4f4f5;
+  width: 100%;
+  min-width: 1512px;
+  min-height: 982px;
+  position: relative;
+}
+
+.dokumen-administrasi .rectangle {
+  position: absolute;
+  top: 341px;
+  left: 53px;
+  width: 1406px;
+  height: 583px;
+  background-color: #d9d9d9;
+}
+
+.dokumen-administrasi .header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1512px;
+  height: 194px;
+  display: flex;
+  flex-direction: column;
+  background-color: #222222;
+  box-shadow: 0px 4.63px 6.94px -1.16px #0000001a, 0px 2.31px 4.63px -2.31px
+    #0000001a;
+}
+
+.dokumen-administrasi .container {
+  margin-left: 23px;
+  width: 1436px;
+  height: 89px;
+  position: relative;
+  margin-top: 33px;
+}
+
+.dokumen-administrasi .container-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 89px;
+  height: 89px;
+  display: flex;
+  background-color: #fffefe1a;
+  border-radius: 22.36px;
+  border: 1.24px solid;
+  border-color: #fffefe33;
+  backdrop-filter: blur(7.45px) brightness(100%);
+  -webkit-backdrop-filter: blur(7.45px) brightness(100%);
+}
+
+.dokumen-administrasi .vector-wrapper {
+  margin-top: 18.6px;
+  width: 52.18px;
+  height: 52.18px;
+  margin-left: 18.6px;
+  position: relative;
+}
+
+.dokumen-administrasi .vector {
+  position: absolute;
+  width: 75.00%;
+  height: 82.87%;
+  top: 8.63%;
+  left: 12.50%;
+}
+
+.dokumen-administrasi .div {
+  position: absolute;
+  top: 9px;
+  left: 119px;
+  width: 451px;
+  height: 73px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dokumen-administrasi .div-wrapper {
+  width: 450.94px;
+  display: flex;
+}
+
+.dokumen-administrasi .text-wrapper {
+  margin-top: 0;
+  width: 72.67px;
+  height: 29.81px;
+  margin-left: -1.9px;
+  font-family: "Manrope-Medium", Helvetica;
+  font-weight: 500;
+  color: #fffefecc;
+  font-size: 22.4px;
+  letter-spacing: 1.12px;
+  line-height: 29.8px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .container-2 {
+  margin-left: 0;
+  width: 450.94px;
+  height: 42.86px;
+  margin-top: 0;
+  display: flex;
+}
+
+.dokumen-administrasi .text-wrapper-2 {
+  margin-top: 0;
+  width: 339.14px;
+  height: 46.59px;
+  margin-left: -2.8px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 33.5px;
+  letter-spacing: 0;
+  line-height: 41.9px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .container-3 {
+  position: absolute;
+  top: 38px;
+  left: 1013px;
+  width: 329px;
+  height: 53px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dokumen-administrasi .container-4 {
+  width: 329px;
+  height: 31.27px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dokumen-administrasi .text-wrapper-3 {
+  margin-top: 0;
+  width: 247.43px;
+  height: 33.99px;
+  margin-right: -0.4px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 24.5px;
+  text-align: right;
+  letter-spacing: 0;
+  line-height: 30.6px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .mahasiswa-wrapper {
+  width: 329px;
+  height: 21.75px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dokumen-administrasi .mahasiswa {
+  margin-top: -0.3px;
+  width: 102px;
+  height: 22px;
+  font-family: "Manrope-Medium", Helvetica;
+  font-weight: 500;
+  color: #fffefecc;
+  font-size: 16.3px;
+  text-align: right;
+  letter-spacing: 0.82px;
+  line-height: 21.8px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .button {
+  position: absolute;
+  width: 5.22%;
+  height: 84.27%;
+  top: 31.46%;
+  left: 94.78%;
+  display: flex;
+  background-color: #589aff78;
+  border-radius: 41943004px;
+}
+
+.dokumen-administrasi .container-5 {
+  margin-top: 15.0px;
+  width: 45px;
+  margin-left: 15.0px;
+  display: flex;
+}
+
+.dokumen-administrasi .text-wrapper-4 {
+  margin-top: 0;
+  width: 26px;
+  height: 45px;
+  margin-left: 9.4px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #0088dc;
+  font-size: 30px;
+  letter-spacing: 0;
+  line-height: 45.0px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .container-6 {
+  margin-left: 23px;
+  width: 418.73px;
+  height: 37.01px;
+  display: flex;
+}
+
+.dokumen-administrasi .container-7 {
+  display: inline-flex;
+  width: 288px;
+  height: 38px;
+  margin-left: 118px;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 7px 13px;
+  background-color: #fffefe1a;
+  border-radius: 25875282px;
+  backdrop-filter: blur(6.94px) brightness(100%);
+  -webkit-backdrop-filter: blur(6.94px) brightness(100%);
+}
+
+.dokumen-administrasi .text-wrapper-5 {
+  position: relative;
+  width: fit-content;
+  font-family: "Manrope-Medium", Helvetica;
+  font-weight: 500;
+  color: #fffefee6;
+  font-size: 16.2px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 23.1px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .container-8 {
+  position: absolute;
+  top: 229px;
+  left: calc(50.00% - 733px);
+  width: 1445px;
+  height: 72px;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 0.67px solid;
+  border-color: #d4d3d780;
+  box-shadow: 0px 1px 3px #0000001a, 0px 1px 2px -1px #0000001a;
+}
+
+.dokumen-administrasi .container-9 {
+  margin-top: 16px;
+  width: 311px;
+  height: 82px;
+  margin-left: 577px;
+  display: flex;
+}
+
+.dokumen-administrasi .container-10 {
+  width: 311px;
+  height: 28px;
+  margin-left: 41px;
+  position: relative;
+}
+
+.dokumen-administrasi .container-11 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 171px;
+  height: 28px;
+  display: flex;
+}
+
+.dokumen-administrasi .text-wrapper-6 {
+  margin-top: 1.3px;
+  width: 174px;
+  height: 25px;
+  margin-left: -1.5px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #222222;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .container-12 {
+  position: absolute;
+  top: 2px;
+  left: 152px;
+  width: 139px;
+  height: 26px;
+  display: flex;
+  background-color: #fef3c6;
+  border-radius: 22369600px;
+  border: 0.67px solid;
+  border-color: #fde585;
+}
+
+.dokumen-administrasi .text-wrapper-7 {
+  margin-top: 5px;
+  width: 26px;
+  height: 16px;
+  margin-left: 61.8px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #ba4c00;
+  font-size: 12px;
+  letter-spacing: 0;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .text-wrapper-8 {
+  position: absolute;
+  top: 362px;
+  left: 81px;
+  width: 223px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #222222;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .frame {
+  display: flex;
+  width: 1094px;
+  align-items: flex-start;
+  gap: 10px;
+  position: absolute;
+  top: 426px;
+  left: 199px;
+  overflow: hidden;
+}
+
+.dokumen-administrasi .group {
+  position: relative;
+  width: 1100px;
+  height: 224px;
+}
+
+.dokumen-administrasi .div-2 {
+  position: absolute;
+  top: 38px;
+  left: calc(50.00% - 550px);
+  width: 1094px;
+  height: 54px;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 0.67px solid;
+  border-color: #d4d3d780;
+  box-shadow: 0px 1px 3px #0000001a, 0px 1px 2px -1px #0000001a;
+}
+
+.dokumen-administrasi .text-wrapper-9 {
+  margin-top: 15px;
+  width: 77px;
+  height: 28px;
+  margin-left: 19px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #000000;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .text-wrapper-10 {
+  margin-top: 11px;
+  width: 98px;
+  height: 28px;
+  margin-left: 380px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #000000;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .text-wrapper-11 {
+  margin-top: 13px;
+  width: 62px;
+  height: 28px;
+  margin-left: 388px;
+  color: #000000;
+  font-size: 18px;
+  line-height: 28px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .text-wrapper-12 {
+  position: absolute;
+  top: 0;
+  left: 23px;
+  width: 250px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #38383896;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+}
+
+.dokumen-administrasi .text-wrapper-13 {
+  position: absolute;
+  top: 0;
+  left: 480px;
+  width: 112px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #38383896;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+}
+
+.dokumen-administrasi .text-wrapper-14 {
+  position: absolute;
+  top: 0;
+  left: 964px;
+  width: 70px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #38383896;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+}
+
+.dokumen-administrasi .div-3 {
+  top: 106px;
+  position: absolute;
+  left: calc(50.00% - 550px);
+  width: 1094px;
+  height: 54px;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 0.67px solid;
+  border-color: #d4d3d780;
+  box-shadow: 0px 1px 3px #0000001a, 0px 1px 2px -1px #0000001a;
+}
+
+.dokumen-administrasi .text-wrapper-15 {
+  margin-top: 15px;
+  width: 93px;
+  height: 28px;
+  margin-left: 19px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #000000;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .text-wrapper-16 {
+  margin-left: 363px;
+  margin-top: 13px;
+  width: 98px;
+  height: 28px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #000000;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .text-wrapper-17 {
+  margin-top: 13px;
+  width: 62px;
+  height: 28px;
+  margin-left: 389px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #000000;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .div-4 {
+  top: 170px;
+  position: absolute;
+  left: calc(50.00% - 550px);
+  width: 1094px;
+  height: 54px;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 0.67px solid;
+  border-color: #d4d3d780;
+  box-shadow: 0px 1px 3px #0000001a, 0px 1px 2px -1px #0000001a;
+}
+
+.dokumen-administrasi .text-wrapper-18 {
+  margin-top: 15px;
+  width: 176px;
+  height: 28px;
+  margin-left: 19px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #000000;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .text-wrapper-19 {
+  margin-left: 280px;
+  margin-top: 13px;
+  width: 98px;
+  height: 28px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  color: #000000;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.dokumen-administrasi .button-2 {
+  all: unset;
+  box-sizing: border-box;
+  position: absolute;
+  top: 719px;
+  left: 583px;
+  width: 370px;
+  height: 56px;
+  display: flex;
+  background-color: #222222;
+  border-radius: 12px;
+  box-shadow: 0px 10px 15px -3px #22212133, 0px 4px 6px -4px #22212133;
+}
+
+.dokumen-administrasi .text-wrapper-20 {
+  margin-top: 16px;
+  width: 159px;
+  height: 24px;
+  margin-left: 106px;
+  color: #ffffff;
+  font-size: 16px;
+  text-align: center;
+  line-height: 24px;
+  font-family: "Manrope-Bold", Helvetica;
+  font-weight: 700;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.button-2 {
+    display: inline-flex;        /* supaya behave seperti button */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;       /* hilangkan underline */
+    cursor: pointer;
+}
+
+.button-2:hover {
+    opacity: 0.9;
+}
+
+/* pastikan teks di dalamnya clickable */
+.button-2 .text-wrapper-20 {
+    pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .progress-section {
+        padding: 12px;
+    }
+
+    .upload-box,
+    .table-box {
+        padding: 15px;
+    }
+
+    table {
+        min-width: 600px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .header-left h1 {
+        font-size: 18px;
+    }
+
+    .header-left span {
+        font-size: 14px;
+    }
+
+    .progress-fill {
+        font-size: 10px;
+    }
+
+    th,
+    td {
+        font-size: 13px;
+        padding: 10px;
+    }
+}

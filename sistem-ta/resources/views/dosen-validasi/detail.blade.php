@@ -2,7 +2,7 @@
 
 @section('content')
 
-<h2>Detail Mahasiswa</h2>
+<h2>Detail Dokumen Mahasiswa</h2>
 
 <p><strong>NIM:</strong> {{ $mhs->nim }}</p>
 <p><strong>Nama:</strong> {{ $mhs->nama }}</p>
@@ -15,5 +15,17 @@
         Lihat Dokumen
     </a>
 </p>
+
+<form action="/dosen/setujui" method="POST" style="display:inline;">
+    @csrf
+    <input type="hidden" name="nim" value="{{ $mhs->nim }}">
+    <button type="submit">Setujui</button>
+</form>
+
+<form action="/dosen/tolak" method="POST" style="display:inline;">
+    @csrf
+    <input type="hidden" name="nim" value="{{ $mhs->nim }}">
+    <button type="submit">Tolak</button>
+</form>
 
 @endsection
