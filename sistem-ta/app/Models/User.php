@@ -50,11 +50,19 @@ class User extends Authenticatable
     }
 
     public function getProfilePhotoUrlAttribute()
-{
-    return $this->profile_photo_path
-                ? asset('storage/' . $this->profile_photo_path)
-                : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=FFFFFF&background=111827&bold=true';
-}
+    {
+        return $this->profile_photo_path
+                    ? asset('storage/' . $this->profile_photo_path)
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=FFFFFF&background=111827&bold=true';
+    }
 
-public function proposal() { return $this->hasOne(Proposal::class, 'mahasiswa_id'); }
+    public function proposal()
+    {
+        return $this->hasOne(Proposal::class, 'mahasiswa_id')->latestOfMany();
+    }
+
+    public function proposals()
+    {
+        return $this->hasMany(Proposal::class, 'mahasiswa_id');
+    }
 }

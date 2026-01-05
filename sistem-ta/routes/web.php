@@ -14,11 +14,14 @@ use App\Http\Controllers\Mahasiswa\ProposalMahasiswaController;
 // Koordinator
 use App\Http\Controllers\Koordinator\PenetapanController;
 use App\Http\Controllers\Koordinator\UserController;
+use App\Http\Controllers\Koordinator\SidangKoordinatorController;
 
 // Dosen
 use App\Http\Controllers\Dosen\SidangDosenController;
 use App\Http\Controllers\Dosen\MonitoringController;
 use App\Http\Controllers\Dosen\RequestController;
+use App\Http\Controllers\Dosen\DosenProposalController;
+use App\Http\Controllers\Dosen\DosenBimbinganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,12 +66,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/proposal/create', 'create')->name('proposal.create');
             Route::post('/proposal', 'store')->name('proposal.store');
             Route::get('/proposal/{id}/download', 'download')->name('proposal.download');
+            Route::put('/proposal/{id}/update-file', 'updateFile')->name('proposal.updateFile');
+            Route::post('/proposal/upload-draft', 'uploadDraft')->name('proposal.upload_draft');
         });
 
         // 2. Jadwal Sidang Saya & Reschedule
         Route::controller(SidangMahasiswaController::class)->prefix('sidang')->name('sidang.')->group(function () {
             Route::get('/', 'index')->name('index'); 
-            Route::post('/{id}/ajukan-perubahan', 'ajukanPerubahan')->name('reschedule');
+            Route::post('/{id}/ajukan', 'ajukanPerubahan')->name('ajukan_perubahan');
         });
     });
 
@@ -97,10 +102,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/{id}/keputusan', 'updateKeputusan')->name('keputusan');
         });
 
+        
+
         Route::controller(UserController::class)->group(function() {
         Route::get('/users', 'index')->name('users.index');
         Route::put('/users/{id}/update-role', 'updateRole')->name('users.update-role');
         });
+
+        // API Internal untuk Fetch Data (AJAX)
+        Route::get('/api/get-proposal/{id}', [App\Http\Controllers\Koordinator\SidangKoordinatorController::class, 'getProposalData']);
+        
+        // Route Sidang
+        Route::get('/sidang', [App\Http\Controllers\Koordinator\SidangKoordinatorController::class, 'index'])->name('sidang.index');
+        Route::get('/sidang/create', [App\Http\Controllers\Koordinator\SidangKoordinatorController::class, 'create'])->name('sidang.create');
+        Route::post('/sidang', [App\Http\Controllers\Koordinator\SidangKoordinatorController::class, 'store'])->name('sidang.store');
+        Route::get('/approval', [\App\Http\Controllers\Koordinator\SidangKoordinatorController::class, 'approval'])
+        ->name('approval');
+        Route::post('/approval/{id}', [\App\Http\Controllers\Koordinator\SidangKoordinatorController::class, 'prosesApproval'])
+        ->name('proses_approval');
     });
 
     // [KHUSUS] Buat Jadwal Sidang (Akses Koordinator, tapi Nama Route 'dosen.sidang...')
@@ -135,8 +154,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Detail Proposal
             Route::get('/proposal/{id}', 'show')->name('proposal.show');
 
-            Route::put('/proposal/{id}/keputusan', 'updateKeputusan')->name('proposal.keputusan');
+            // Route untuk Proposal (Download & Nilai) - Tetap ke DosenProposalController
+            Route::get('/proposal/{id}/download', [DosenProposalController::class, 'downloadProposal'])->name('proposal.download');
+            Route::get('/proposal/{id}/download-khs', [DosenProposalController::class, 'downloadKHS'])->name('proposal.download.khs');
+            Route::put('/proposal/{id}/keputusan', [DosenProposalController::class, 'updateKeputusan'])->name('proposal.keputusan');
+
+            // Route untuk Bimbingan (Jadwal) - Pindah ke DosenBimbinganController
+            // Perhatikan perubahan Class Controller di bawah ini:
+            Route::post('/proposal/{id}/jadwal', [DosenBimbinganController::class, 'store'])->name('proposal.jadwal.store');
+            Route::put('/jadwal/{id}/respon', [DosenBimbinganController::class, 'update'])->name('proposal.jadwal.respon');
+        
         });
+
+        Route::get('/sidang', [\App\Http\Controllers\Dosen\SidangDosenController::class, 'index'])
+        ->name('sidang.index');
+
+        // PROSES REQUEST (Terima/Tolak)
+        Route::post('/sidang/pengajuan/{id}', [\App\Http\Controllers\Dosen\SidangDosenController::class, 'prosesPengajuan'])
+        ->name('sidang.proses_pengajuan');
+            
+        // (Route create & store yang lama tetap ada jika dibutuhkan)
+        Route::get('/sidang/create', [\App\Http\Controllers\Dosen\SidangDosenController::class, 'create'])->name('sidang.create');
+        Route::post('/sidang', [\App\Http\Controllers\Dosen\SidangDosenController::class, 'store'])->name('sidang.store');
     });
 
 });
