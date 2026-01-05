@@ -10,13 +10,17 @@ class BimbinganSlot extends Model
 
     protected $guarded = ['id'];
 
-    // Relasi ke Dosen
+    // TAMBAHAN WAJIB: Agar $jadwal->waktu_bimbingan bisa diformat tanggalnya
+    protected $casts = [
+        'waktu_bimbingan' => 'datetime',
+        'waktu_reschedule' => 'datetime',
+    ];
+
     public function dosen()
     {
         return $this->belongsTo(User::class, 'dosen_id');
     }
 
-    // Relasi ke Mahasiswa
     public function mahasiswa()
     {
         return $this->belongsTo(User::class, 'mahasiswa_id');

@@ -17,7 +17,11 @@ class Proposal extends Model
         'judul',
         'deskripsi',
         'file_proposal',
-        'status'
+        'file_khs', // WAJIB DITAMBAHKAN
+        'file_ta',
+        'status',
+        'nilai',
+        'komentar'
     ];
 
     // Relasi ke Mahasiswa
@@ -33,7 +37,7 @@ class Proposal extends Model
     }
 
     // Relasi ke Dosen Penguji
-    public function penguji()
+    public function dosenPenguji()
     {
         return $this->belongsTo(User::class, 'dosen_penguji_id');
     }
