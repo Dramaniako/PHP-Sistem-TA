@@ -43,7 +43,7 @@
 
                 {{-- [BARU] Input NIM --}}
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-xs font-bold mb-1 ml-1 uppercase">NIM</label>
+                    <label class="block text-gray-700 text-xs font-bold mb-1 ml-1 uppercase">NIM / NIDN</label>
                     <input type="text" name="nim" value="{{ old('nim') }}" required
                         class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition outline-none"
                         placeholder="Contoh: 2208561xxx">

@@ -68,6 +68,7 @@ class SidangKoordinatorController extends Controller
     {
         $request->validate([
             'proposal_id'    => 'required|exists:proposals,id',
+            'jenis_sidang' => 'required|string',
             'tanggal_sidang' => 'required|date',
             'jam_mulai'      => 'required',
             'jam_selesai'    => 'required|after:jam_mulai',
@@ -80,7 +81,7 @@ class SidangKoordinatorController extends Controller
             'mahasiswa_id' => $proposal->mahasiswa_id,
             'dosen_id'     => $proposal->dosen_penguji_id, // Penguji menjadi Dosen Penilai Sidang
             'judul_ta'     => $proposal->judul,
-            'jenis_sidang' => 'sidang_akhir', // Sesuai format database (snake_case)
+            'jenis_sidang' => $request->jenis_sidang, // Sesuai format database (snake_case)
             'tanggal'      => $request->tanggal_sidang,
             'jam_mulai'    => $request->jam_mulai,
             'jam_selesai'  => $request->jam_selesai,

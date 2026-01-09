@@ -32,53 +32,10 @@
                     </div>
 
                     {{-- FORM PENGAJUAN (Hanya Tampil Jika Tipe Jadwal = SIDANG) --}}
-                    <div x-show="selectedEvent.extendedProps?.tipe_jadwal === 'sidang' && selectedEvent.extendedProps?.is_mine" 
-                        class="mt-6 pt-4 border-t border-gray-100">
-                        
-                        <h4 class="font-bold text-blue-600 text-sm mb-3">Ajukan Perubahan Jadwal Sidang</h4>
-                        
-                        {{-- Form Action Dinamis --}}
-                        <form :action="'{{ url('/mahasiswa/sidang') }}/' + (selectedEvent.extendedProps?.sidang_id) + '/ajukan'" method="POST">
-                            @csrf
-                            
-                            <div class="space-y-4">
-                                {{-- 1. Input Tanggal Baru --}}
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700">Saran Tanggal Baru</label>
-                                    <input type="date" 
-                                        name="tanggal_baru_saran" 
-                                        required 
-                                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                    <p class="text-[10px] text-gray-500 mt-1">*Pilih tanggal setelah hari ini</p>
-                                </div>
-
-                                {{-- 2. Input Jam Baru --}}
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700">Saran Jam Baru</label>
-                                    <input type="time" 
-                                        name="jam_baru_saran" 
-                                        required 
-                                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                </div>
-
-                                {{-- 3. Input Alasan --}}
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700">Alasan Perubahan</label>
-                                    <textarea name="alasan_perubahan" 
-                                            rows="3" 
-                                            required 
-                                            minlength="10"
-                                            placeholder="Jelaskan alasan Anda (minimal 10 karakter)..."
-                                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="mt-6">
-                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl transition shadow-lg">
-                                    Kirim Pengajuan
-                                </button>
-                            </div>
-                        </form>
+                    <div x-show="selectedEvent.extendedProps?.tipe_jadwal === 'sidang' && selectedEvent.extendedProps?.is_mine"> 
+                        <p class="text-sm text-gray-500 italic">
+                            *Tidak dapat melakukan perubahan jadwal sidang yang telah ditetapkan.
+                        </p>
                     </div>
 
                     {{-- Opsi: Pesan untuk Jadwal Bimbingan --}}

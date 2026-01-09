@@ -54,11 +54,24 @@
                             <h4 class="text-gray-800 font-bold border-b border-gray-100 pb-2 mb-4 flex items-center gap-2">
                                 <span class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded">2</span> Detail Pelaksanaan
                             </h4>
+                            
+                            <div class="mb-8">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block mb-1">Jenis Sidang</label>
+                            <select name="jenis_sidang" class="w-full border-gray-300 rounded-xl p-3 focus:ring-blue-500 focus:border-blue-500 shadow-sm" required>
+                                <option value="">-- Pilih Jenis Sidang --</option>
+                                <option value="Sidang Proposal">Sidang Proposal</option>
+                                <option value="Sidang Hasil">Sidang Hasil</option>
+                                <option value="Sidang Akhir / Komprehensif">Sidang Akhir / Komprehensif</option>
+                            </select>
+                        </div>
 
                             <div class="space-y-4">
                             {{-- Input Tanggal --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Sidang</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
                                 <input type="date" name="tanggal_sidang" required
                                     class="w-full border-gray-300 rounded-xl p-3 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                             </div>
@@ -93,6 +106,10 @@
                             </a>
                             <button type="submit" 
                                     class="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition transform hover:-translate-y-0.5"
+                                    @click="if(!khs_link || !ta_link) { 
+                                        alert('Data mahasiswa perlu dilengkapi sebelum melakukan penjadwalan!'); 
+                                        $event.preventDefault(); 
+                                    }"
                                     :disabled="!proposal_id" 
                                     :class="!proposal_id ? 'opacity-50 cursor-not-allowed' : ''">
                                 <i class="fas fa-save mr-2"></i> Simpan Jadwal
