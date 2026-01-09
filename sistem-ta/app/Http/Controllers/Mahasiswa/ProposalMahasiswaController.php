@@ -23,58 +23,59 @@ class ProposalMahasiswaController extends Controller
     // Form Pengajuan Judul
     public function create()
     {
-        // Cek apakah mahasiswa sudah pernah mengajukan?
-        $existing = Proposal::where('mahasiswa_id', Auth::id())->first();
-        if ($existing) {
-            return redirect()->route('sidang.index')->with('error', 'Anda sudah mengajukan proposal.');
+        // Ambil data proposal milik mahasiswa yang sedang login
+        $proposal = Proposal::where('mahasiswa_id', Auth::id())->first();
+
+        // JIKA proposal sudah ada DAN statusnya BUKAN 'ditolak'
+        // (Artinya sedang pending atau sudah disetujui), maka dilarang buat lagi.
+        if ($proposal && $proposal->status !== 'ditolak') {
+            return redirect()->route('mahasiswa.sidang.status')
+                            ->with('error', 'Anda sudah memiliki proposal yang sedang diproses.');
         }
 
-        return view('mahasiswa.proposal.create');
+        // Tampilkan view create (kirim variabel $proposal untuk auto-fill di form jika ada)
+        return view('mahasiswa.proposal.create', compact('proposal'));
     }
 
     public function store(Request $request)
     {
-        // 1. Validasi Input (Termasuk file_khs)
+        // 1. Validasi Input
+        // file_proposal dan file_khs dibuat 'nullable' jika data sudah ada (update), 
+        // tapi tetap 'required' jika data baru.
+        $existing = Proposal::where('mahasiswa_id', Auth::id())->first();
+
         $request->validate([
             'judul'         => 'required|string|max:255',
             'deskripsi'     => 'required|string',
-            'file_proposal' => 'required|file|mimes:pdf|max:5120', // Maks 5MB
-            'file_khs'      => 'required|file|mimes:pdf|max:2048', // WAJIB ADA: Maks 2MB
+            'file_proposal' => $existing ? 'nullable|file|mimes:pdf|max:5120' : 'required|file|mimes:pdf|max:5120',
+            'file_khs'      => $existing ? 'nullable|file|mimes:pdf|max:2048' : 'required|file|mimes:pdf|max:2048',
         ]);
 
-        // 2. Cek apakah Mahasiswa sudah punya proposal (Opsional, untuk mencegah duplikasi)
-        $existing = Proposal::where('mahasiswa_id', auth()->id())->first();
-        if($existing) {
-            return back()->with('error', 'Anda sudah mengajukan proposal sebelumnya.');
-        }
+        // 2. Siapkan data dasar
+        $data = [
+            'judul'     => $request->judul,
+            'deskripsi' => $request->deskripsi,
+            'status'    => 'pending', // Reset status jadi pending jika sebelumnya ditolak
+        ];
 
-        // 3. Proses Upload File
-        $pathProposal = null;
-        $pathKhs = null;
-
+        // 3. Proses Upload File (Hanya update kolom file jika user mengunggah file baru)
         if ($request->hasFile('file_proposal')) {
-            // Simpan di folder 'storage/app/public/proposals'
-            $pathProposal = $request->file('file_proposal')->store('proposals', 'public');
+            $data['file_proposal'] = $request->file('file_proposal')->store('proposals', 'public');
         }
 
-        // PERBAIKAN: Logika Simpan KHS
         if ($request->hasFile('file_khs')) {
-            // Simpan di folder 'storage/app/public/khs'
-            $pathKhs = $request->file('file_khs')->store('khs', 'public');
+            $data['file_khs'] = $request->file('file_khs')->store('khs', 'public');
         }
 
-        // 4. Simpan ke Database
-        Proposal::create([
-            'mahasiswa_id'  => auth()->id(),
-            'judul'         => $request->judul,
-            'deskripsi'     => $request->deskripsi,
-            'file_proposal' => $pathProposal, // Kolom file utama
-            'file_khs'      => $pathKhs,      // KOLOM YANG SEBELUMNYA HILANG
-            'status'        => 'pending',
-        ]);
+        // 4. Gunakan updateOrCreate
+        // Cari berdasarkan mahasiswa_id, jika ketemu lakukan UPDATE, jika tidak lakukan INSERT
+        Proposal::updateOrCreate(
+            ['mahasiswa_id' => Auth::id()],
+            $data
+        );
 
-        return redirect()->route('mahasiswa.proposal.index')
-                         ->with('success', 'Proposal dan KHS berhasil diajukan!');
+        return redirect()->route('mahasiswa.proposal.status')
+                        ->with('success', 'Proposal berhasil diperbarui dan sedang menunggu verifikasi!');
     }
 
     public function download($id)

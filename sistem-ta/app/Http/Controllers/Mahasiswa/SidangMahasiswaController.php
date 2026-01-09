@@ -64,35 +64,12 @@ class SidangMahasiswaController extends Controller
                     'tipe_jadwal' => 'bimbingan', // Penanda tipe
                     'lokasi'      => $bim->tempat,
                     'topik'       => $bim->topik,
+                    'penguji'     => $bim->dosen->name ?? '-',
                     'is_mine'     => true
                 ]
             ];
         }
 
         return view('mahasiswa.sidang.index', compact('events'));
-    }
-
-    // ... method ajukanPerubahan tetap sama ...
-    public function ajukanPerubahan(Request $request, $id)
-    {
-        // (Kode sama seperti yang Anda miliki sebelumnya)
-        $sidang = SidangJadwal::findOrFail($id);
-        if ($sidang->mahasiswa_id != Auth::id()) {
-            return back()->with('error', 'Anda tidak memiliki akses.');
-        }
-        $request->validate([
-            'alasan_perubahan'   => 'required|string|min:10',
-            'tanggal_baru_saran' => 'required|date|after:today',
-            'jam_baru_saran'     => 'required'
-        ]);
-        PengajuanPerubahan::create([
-            'sidang_jadwal_id' => $sidang->id,
-            'mahasiswa_id'     => Auth::id(),
-            'alasan'           => $request->alasan_perubahan,
-            'tanggal_saran'    => $request->tanggal_baru_saran,
-            'jam_saran'        => $request->jam_baru_saran,
-            'status'           => 'pending'
-        ]);
-        return back()->with('success', 'Pengajuan berhasil dikirim.');
     }
 }
