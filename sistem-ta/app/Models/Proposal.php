@@ -41,4 +41,10 @@ class Proposal extends Model
     {
         return $this->belongsTo(User::class, 'dosen_penguji_id');
     }
+
+    public function dosenRequests()
+    {
+        // Relasi satu proposal memiliki banyak request dosen
+        return $this->hasMany(DosenRequest::class, 'proposal_id');
+    }
 }

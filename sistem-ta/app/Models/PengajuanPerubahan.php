@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,9 +16,11 @@ class PengajuanPerubahan extends Model
         'sidang_jadwal_id',
         'mahasiswa_id',
         'alasan',
-        'tanggal_saran',
-        'jam_saran',
+        'tanggal_saran', // Pastikan kolom ini NULLABLE di database
+        'jam_saran',     // Pastikan kolom ini NULLABLE di database
         'status',
+        'file_pendukung', // Tambahkan ini
+        'tipe_pengaju',   // Tambahkan ini
         'catatan_admin'
     ];
 

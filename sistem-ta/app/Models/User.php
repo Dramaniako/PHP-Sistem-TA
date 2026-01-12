@@ -12,6 +12,19 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    // app/Models/User.php
+
+    public function penetapan()
+    {
+        // Sesuaikan nama model 'Proposal' dengan model yang menyimpan kolom dosen_pembimbing_id
+        return $this->hasOne(\App\Models\Proposal::class, 'mahasiswa_id');
+    }
+
+    public function dokumens()
+    {
+        return $this->hasMany(\App\Models\DokumenTa::class, 'mahasiswa_id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -52,8 +65,8 @@ class User extends Authenticatable
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo_path
-                    ? asset('storage/' . $this->profile_photo_path)
-                    : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=FFFFFF&background=111827&bold=true';
+            ? asset('storage/' . $this->profile_photo_path)
+            : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=FFFFFF&background=111827&bold=true';
     }
 
     public function proposal()

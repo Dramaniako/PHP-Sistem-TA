@@ -97,9 +97,6 @@
 
                         {{-- Tombol Simpan --}}
                         <div class="flex items-center gap-4 pt-4">
-                            <x-primary-button class="bg-indigo-600 hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900">
-                                {{ __('Simpan Perubahan') }}
-                            </x-primary-button>
 
                             @if (session('status') === 'profile-updated')
                                 <p

@@ -21,7 +21,6 @@
         @else
             {{-- KONDISI 2: SUDAH UPLOAD (TAMPILKAN STATUS) --}}
             
-            {{-- HEADER INFO UTAMA --}}
             <div class="bg-white rounded-t-2xl shadow-sm border border-gray-100 p-8">
                 <div class="flex flex-col md:flex-row justify-between md:items-start gap-4">
                     <div>
@@ -34,7 +33,6 @@
                         </p>
                     </div>
                     
-                    {{-- BADGE STATUS BESAR --}}
                     <div class="flex-shrink-0">
                         @if($proposal->status == 'pending')
                             <span class="bg-yellow-100 text-yellow-700 px-6 py-2 rounded-full font-bold text-sm border border-yellow-200 shadow-sm flex items-center gap-2">
@@ -57,10 +55,8 @@
                 </div>
             </div>
 
-            {{-- BODY STATUS & FEEDBACK --}}
             <div class="bg-gray-50 rounded-b-2xl shadow-sm border-x border-b border-gray-100 p-8 space-y-6">
                 
-                {{-- JIKA DISETUJUI: TAMPILKAN DOSEN --}}
                 @if($proposal->status == 'disetujui')
                     <div class="bg-green-50 border border-green-200 rounded-xl p-6 flex items-center gap-6">
                         <div class="bg-white p-4 rounded-full shadow-sm text-green-600 text-2xl">
@@ -74,20 +70,34 @@
                     </div>
                 @endif
 
-                {{-- JIKA REVISI: TAMPILKAN CATATAN --}}
+                {{-- JIKA REVISI: TAMPILKAN CATATAN & FORM UPLOAD ULANG --}}
                 @if($proposal->status == 'revisi')
                     <div class="bg-orange-50 border border-orange-200 rounded-xl p-6">
                         <div class="flex items-start gap-4">
                             <i class="fas fa-comment-dots text-orange-500 text-xl mt-1"></i>
-                            <div>
+                            <div class="w-full">
                                 <h4 class="font-bold text-orange-800 mb-2">Catatan Revisi dari Koordinator/Dosen:</h4>
-                                <div class="bg-white p-4 rounded-lg border border-orange-100 text-gray-700 text-sm italic">
+                                <div class="bg-white p-4 rounded-lg border border-orange-100 text-gray-700 text-sm italic mb-6">
                                     "{{ $proposal->komentar ?? 'Tidak ada catatan khusus, silakan hubungi koordinator.' }}"
                                 </div>
-                                <div class="mt-4">
-                                    {{-- Tombol untuk edit proposal (jika Anda punya fitur edit) --}}
-                                    {{-- <a href="#" class="text-sm font-bold text-orange-700 hover:underline">Edit Proposal & Upload Ulang &rarr;</a> --}}
-                                    <p class="text-xs text-orange-600 mt-2">*Silakan perbaiki proposal Anda dan hubungi Koordinator.</p>
+
+                                {{-- Form Re-upload untuk Revisi --}}
+                                <div class="bg-white p-6 rounded-xl border border-orange-200 shadow-sm">
+                                    <h5 class="text-sm font-bold text-gray-700 mb-4">Upload Hasil Perbaikan Proposal</h5>
+                                    <form action="{{ route('mahasiswa.proposal.update_revisi', $proposal->id) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">File Proposal Baru (PDF)</label>
+                                                <input type="file" name="file_proposal" accept=".pdf" required
+                                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                                            </div>
+                                            <button type="submit" class="bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-orange-700 transition">
+                                                Kirim Perbaikan Proposal
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +122,6 @@
                     </div>
                 @endif
 
-                {{-- TOMBOL LIHAT FILE --}}
                 <div class="flex justify-end pt-4 border-t border-gray-200">
                     <a href="{{ route('mahasiswa.proposal.download', $proposal->id) }}" class="text-gray-500 hover:text-blue-600 font-bold text-sm flex items-center gap-2">
                         <i class="fas fa-file-pdf"></i> Lihat Dokumen yang Saya Upload

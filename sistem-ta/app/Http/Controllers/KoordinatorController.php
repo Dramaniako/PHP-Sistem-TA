@@ -14,35 +14,44 @@ class KoordinatorController extends Controller
     {
         // Ambil pengajuan yang statusnya masih 'pending'
         $pengajuans = PengajuanPerubahan::with(['sidangJadwal', 'mahasiswa'])
-                        ->where('status', 'pending')
-                        ->orderBy('created_at', 'asc') // Yang lama di atas
-                        ->get();
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'asc') // Yang lama di atas
+            ->get();
 
         return view('koordinator.approval', compact('pengajuans'));
     }
 
-    // Logic Menyetujui (Approve)
-    public function approve($id)
+    public function approve(Request $request, $id)
     {
-        // Gunakan Transaction agar Data Konsisten
-        DB::transaction(function () use ($id) {
-            $pengajuan = PengajuanPerubahan::findOrFail($id);
-            $jadwalSidang = SidangJadwal::findOrFail($pengajuan->sidang_jadwal_id);
+        $request->validate([
+            'tanggal_baru' => 'required|date',
+            'jam_baru' => 'required',
+        ]);
 
-            // 1. Update Jadwal Utama dengan Tanggal Baru dari Pengajuan
-            $jadwalSidang->update([
-                'tanggal'     => $pengajuan->tanggal_saran,
-                'jam_mulai'   => $pengajuan->jam_saran,
-                // Kita asumsi durasi sama (2 jam), jadi jam selesai disesuaikan
-                // Atau biarkan manual nanti. Disini saya set jam selesai manual +2 jam
-                'jam_selesai' => date('H:i:s', strtotime($pengajuan->jam_saran) + 7200), 
+        $pengajuan = PengajuanPerubahan::findOrFail($id);
+        $sidang = SidangJadwal::findOrFail($pengajuan->sidang_jadwal_id);
+
+        \DB::transaction(function () use ($request, $pengajuan, $sidang) {
+            // 1. Update Jadwal Sidang Utama
+            $sidang->update([
+                'tanggal' => $request->tanggal_baru,
+                'jam_mulai' => $request->jam_baru,
+                'jam_selesai' => date('H:i:s', strtotime($request->jam_baru) + 7200), // +2 jam
             ]);
 
-            // 2. Ubah Status Pengajuan jadi Disetujui
+            // 2. Tandai Pengajuan Selesai
             $pengajuan->update(['status' => 'disetujui']);
+
+            // 3. Simpan ke Log Riwayat Mahasiswa (Agar muncul di Timeline)
+            $this->simpanLog(
+                $sidang->mahasiswa_id,
+                'Sidang',
+                'Jadwal Diperbarui',
+                'Koordinator telah memperbarui jadwal sidang berdasarkan permintaan dosen.'
+            );
         });
 
-        return back()->with('success', 'Jadwal berhasil diperbarui sesuai pengajuan.');
+        return redirect()->back()->with('success', 'Jadwal berhasil diperbarui.');
     }
 
     // Logic Menolak (Reject)

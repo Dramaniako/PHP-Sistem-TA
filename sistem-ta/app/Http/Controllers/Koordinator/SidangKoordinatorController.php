@@ -5,135 +5,182 @@ namespace App\Http\Controllers\Koordinator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Proposal;
-use App\Models\SidangJadwal; // Pastikan ini ada
+use App\Models\SidangJadwal;
 use App\Models\User;
 use App\Models\PengajuanPerubahan;
+use App\Models\DosenRequest;
+use App\Traits\LogAktivitas;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SidangKoordinatorController extends Controller
 {
+    use LogAktivitas;
+
     public function index()
     {
-        // PERBAIKAN DI SINI:
-        // Gunakan 'SidangJadwal', bukan 'Sidang'
         $jadwal_sidang = SidangJadwal::with(['mahasiswa', 'dosen'])->latest()->get();
-        
-        return view('koordinator.sidang.index', compact('jadwal_sidang'));
+        return view('koordinator.sidang.index', data: compact('jadwal_sidang'));
     }
 
-    // ============================================================
-    // Method Create (Menyesuaikan dengan View Baru)
-    // ============================================================
+    public function indexApproval()
+    {
+        $pengajuans = PengajuanPerubahan::with(['sidangJadwal.mahasiswa', 'sidangJadwal.dosen'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return view('koordinator.approval', compact('pengajuans'));
+    }
+
     public function create()
     {
-        // Ambil data mahasiswa yang:
-        // 1. Memiliki proposal
-        // 2. Status proposal 'disetujui'
-        $mahasiswas = User::whereHas('proposal', function($q) {
+        $mahasiswas = User::whereHas('proposal', function ($q) {
             $q->where('status', 'disetujui');
         })->get();
 
         return view('koordinator.sidang.create', compact('mahasiswas'));
     }
 
-    // ============================================================
-    // API: Auto-fill Data (Dipanggil via AJAX/Fetch di View)
-    // ============================================================
-    public function getProposalData($id)
+    public function getProposalData($mahasiswa_id)
     {
-        $proposal = Proposal::with(['dosenPembimbing', 'dosenPenguji'])
-                    ->where('mahasiswa_id', $id)
-                    ->where('status', 'disetujui') 
-                    ->latest()
-                    ->first();
+        $proposal = Proposal::with(['dosenPembimbing', 'dosenRequests.dosen', 'mahasiswa'])
+            ->where('mahasiswa_id', $mahasiswa_id)
+            ->latest()
+            ->first();
 
-        if(!$proposal) {
-            return response()->json(['error' => 'Data tidak ditemukan atau belum disetujui'], 404);
-        }
+        if (!$proposal)
+            return response()->json(['error' => 'Not Found'], 404);
+
+        $pengujiNames = $proposal->dosenRequests
+            ->filter(function ($req) {
+                return str_contains($req->role, 'penguji') && $req->status === 'accepted';
+            })
+            ->map(fn($req) => $req->dosen->name)
+            ->values()
+            ->toArray();
 
         return response()->json([
             'proposal_id' => $proposal->id,
-            'judul'       => $proposal->judul,
-            'pembimbing'  => $proposal->dosenPembimbing->name ?? 'Belum ditentukan',
-            'penguji'     => $proposal->dosenPenguji->name ?? 'Belum ditentukan',
-            'file_khs'    => $proposal->file_khs ? asset('storage/'.$proposal->file_khs) : null,
-            'file_ta'     => $proposal->file_ta ? asset('storage/'.$proposal->file_ta) : null,
+            'judul' => $proposal->judul,
+            'pembimbing' => $proposal->dosenPembimbing->name ?? 'Belum ada',
+            'penguji_list' => $pengujiNames,
+            // Pastikan variabel ini dikirim untuk pengecekan di Blade
+            'file_ta' => $proposal->file_ta ? true : false,
+            'file_khs' => $proposal->file_khs ? true : false,
         ]);
     }
 
-    // ============================================================
-    // Method Store (Mapping Input View ke Database)
-    // ============================================================
-    public function store(Request $request)
+    public function edit($id)
+    {
+        $sidang = SidangJadwal::findOrFail($id);
+        $dosens = User::where('role', 'dosen')->get();
+
+        return view('koordinator.sidang.edit', compact('sidang', 'dosens'));
+    }
+
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'proposal_id'    => 'required|exists:proposals,id',
-            'jenis_sidang' => 'required|string',
+            'jenis_sidang' => 'required',
             'tanggal_sidang' => 'required|date',
-            'jam_mulai'      => 'required',
-            'jam_selesai'    => 'required|after:jam_mulai',
-            'ruangan'        => 'required|string',
+            'jam_mulai' => 'required',
+            'jam_selesai' => 'required|after:jam_mulai',
+            'ruangan' => 'required|string',
+            'status' => 'required|in:dijadwalkan,selesai,dibatalkan,reschedule',
         ]);
 
-        $proposal = \App\Models\Proposal::findOrFail($request->proposal_id);
+        $sidang = \App\Models\SidangJadwal::findOrFail($id);
+
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            // Pastikan dosen_id terisi agar tidak error NOT NULL di database
+            $dosen_id = (isset($request->dosen_penguji_id) && !empty($request->dosen_penguji_id))
+                ? $request->dosen_penguji_id[0]
+                : $sidang->dosen_id;
+
+            // 1. Simpan perubahan ke database
+            $sidang->update([
+                'dosen_id' => $dosen_id,
+                'jenis_sidang' => $request->jenis_sidang,
+                'tanggal' => $request->tanggal_sidang,
+                'jam_mulai' => $request->jam_mulai,
+                'jam_selesai' => $request->jam_selesai,
+                'lokasi' => $request->ruangan,
+                'status' => $request->status,
+            ]);
+
+            // 2. LOG AKTIVITAS (Log dipastikan aktif)
+            $this->simpanLog(
+                $sidang->mahasiswa_id,
+                'Sidang',
+                'Update Jadwal',
+                "Memperbarui jadwal sidang menjadi " . strtoupper($request->status)
+            );
+
+            if ($request->filled('pengajuan_id')) {
+                \App\Models\PengajuanPerubahan::where('id', $request->pengajuan_id)->update(['status' => 'disetujui']);
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+            return redirect()->route('koordinator.sidang.index')->with('success', 'Perubahan berhasil disimpan!');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollback();
+            return back()->with('error', 'Gagal Simpan: ' . $e->getMessage());
+        }
+    }
+
+    private function kirimNotifikasiKeDosen($requestDosen)
+    {
+        // Tambahkan logika pengiriman WA/Email di sini jika diperlukan
+    }
+
+    public function store(Request $request)
+    {
+        // 1. Validasi Input
+        $request->validate([
+            'proposal_id' => 'required|exists:proposals,id',
+            'jenis_sidang' => 'required|in:Sidang Proposal,Sidang Akhir',
+            'tanggal_sidang' => 'required|date|after_or_equal:today',
+            'jam_mulai' => 'required',
+            'jam_selesai' => 'required|after:jam_mulai',
+            'ruangan' => 'required|string|max:255',
+        ]);
+
+        // 2. Ambil data proposal untuk mendapatkan mahasiswa_id
+        $proposal = Proposal::findOrFail($request->proposal_id);
 
         SidangJadwal::create([
+            'proposal_id' => $request->proposal_id,
             'mahasiswa_id' => $proposal->mahasiswa_id,
-            'dosen_id'     => $proposal->dosen_penguji_id, // Penguji menjadi Dosen Penilai Sidang
-            'judul_ta'     => $proposal->judul,
-            'jenis_sidang' => $request->jenis_sidang, // Sesuai format database (snake_case)
-            'tanggal'      => $request->tanggal_sidang,
-            'jam_mulai'    => $request->jam_mulai,
-            'jam_selesai'  => $request->jam_selesai,
-            'lokasi'       => $request->ruangan,
-            'status'       => 'dijadwalkan'
+            'dosen_id' => $proposal->dosen_penguji_id, // PASTIKAN NILAI INI ADA
+            'jenis_sidang' => $request->jenis_sidang,
+            'tanggal' => $request->tanggal_sidang,
+            'jam_mulai' => $request->jam_mulai,
+            'jam_selesai' => $request->jam_selesai,
+            'lokasi' => $request->ruangan,
+            'status' => 'dijadwalkan',
         ]);
 
-        return redirect()->route('koordinator.sidang.index')->with('success', 'Jadwal Sidang Berhasil Disimpan!');
+        return redirect()->route('koordinator.sidang.index')->with('success', 'Jadwal berhasil dibuat');
     }
 
-    // ============================================================
-    // 1. HALAMAN APPROVAL (Melihat Request Masuk)
-    // ============================================================
-    public function approval()
+    public function downloadTA($id)
     {
-        $pengajuans = PengajuanPerubahan::with(['sidangJadwal.mahasiswa', 'sidangJadwal.dosen'])
-                        ->where('status', 'pending')
-                        ->latest()
-                        ->get();
-
-        return view('koordinator.sidang.approval', compact('pengajuans'));
+        $proposal = Proposal::with('mahasiswa')->findOrFail($id);
+        if (!$proposal->file_ta || !Storage::exists($proposal->file_ta))
+            return back()->with('error', 'File TA tidak ada.');
+        return Storage::download($proposal->file_ta, 'Draft_TA_' . $proposal->mahasiswa->nim . '.pdf');
     }
 
-    // ============================================================
-    // 2. PROSES APPROVAL (Terima / Tolak)
-    // ============================================================
-    public function prosesApproval(Request $request, $id)
+    public function downloadKHS($id)
     {
-        $request->validate(['keputusan' => 'required|in:terima,tolak']);
-        
-        $pengajuan = PengajuanPerubahan::findOrFail($id);
-        $sidang = SidangJadwal::findOrFail($pengajuan->sidang_jadwal_id);
-
-        if ($request->keputusan == 'terima') {
-            DB::transaction(function() use ($pengajuan, $sidang) {
-                // 1. Update Jadwal Sidang Utama ke Waktu Baru
-                $sidang->update([
-                    'tanggal'     => $pengajuan->tanggal_saran,
-                    'jam_mulai'   => $pengajuan->jam_saran,
-                    // Set jam selesai otomatis +2 jam (atau sesuaikan logika Anda)
-                    'jam_selesai' => date('H:i:s', strtotime($pengajuan->jam_saran) + 7200),
-                ]);
-
-                // 2. Tandai pengajuan disetujui
-                $pengajuan->update(['status' => 'disetujui']);
-            });
-
-            return back()->with('success', 'Jadwal berhasil diubah sesuai pengajuan.');
-        } else {
-            // Jika Ditolak
-            $pengajuan->update(['status' => 'ditolak']);
-            return back()->with('info', 'Pengajuan perubahan jadwal ditolak.');
-        }
+        $proposal = Proposal::with('mahasiswa')->findOrFail($id);
+        if (!$proposal->file_khs || !Storage::exists($proposal->file_khs))
+            return back()->with('error', 'File KHS tidak ada.');
+        return Storage::download($proposal->file_khs, 'KHS_' . $proposal->mahasiswa->nim . '.pdf');
     }
 }
