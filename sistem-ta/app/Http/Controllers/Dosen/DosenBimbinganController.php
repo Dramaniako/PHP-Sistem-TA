@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Proposal;
 use App\Models\BimbinganSlot;
+use App\Traits\LogAktivitas; // Import Trait LogAktivitas
+use Illuminate\Support\Facades\Auth;
 
 class DosenBimbinganController extends Controller
 {
+    use LogAktivitas; // Gunakan Trait LogAktivitas
+
     // A. Simpan Jadwal Baru
     public function store(Request $request, $id)
     {
@@ -19,13 +23,13 @@ class DosenBimbinganController extends Controller
         ]);
 
         $proposal = Proposal::findOrFail($id);
-        
+
         // Pastikan hanya pembimbing yang bisa buat jadwal
         if ($proposal->dosen_pembimbing_id != auth()->id()) {
             abort(403, 'Akses ditolak. Anda bukan pembimbing mahasiswa ini.');
         }
 
-        BimbinganSlot::create([
+        $slot = BimbinganSlot::create([
             'dosen_id' => auth()->id(),
             'mahasiswa_id' => $proposal->mahasiswa_id,
             'waktu_bimbingan' => $request->waktu_bimbingan,
@@ -34,31 +38,14 @@ class DosenBimbinganController extends Controller
             'status' => 'dijadwalkan'
         ]);
 
+        // CATAT LOG RIWAYAT
+        $this->simpanLog(
+            $proposal->mahasiswa_id,
+            'Bimbingan',
+            'Penjadwalan Bimbingan',
+            'Dosen Pembimbing menjadwalkan bimbingan baru pada ' . date('d M Y H:i', strtotime($request->waktu_bimbingan)) . ' di ' . $request->tempat . '. Topik: ' . $request->topik
+        );
+
         return back()->with('success', 'Jadwal bimbingan berhasil dibuat!');
-    }
-
-    // B. Respon Reschedule Mahasiswa
-    public function update(Request $request, $slotId)
-    {
-        $slot = BimbinganSlot::where('id', $slotId)
-                    ->where('dosen_id', auth()->id())
-                    ->firstOrFail();
-
-        if ($request->keputusan == 'terima') {
-            $slot->update([
-                'waktu_bimbingan' => $slot->waktu_reschedule,
-                'status' => 'disetujui_reschedule',
-                'waktu_reschedule' => null,
-                'alasan_reschedule' => null
-            ]);
-        } else {
-            $slot->update([
-                'status' => 'dijadwalkan', // Kembali ke jadwal awal
-                'waktu_reschedule' => null,
-                'alasan_reschedule' => null
-            ]);
-        }
-
-        return back()->with('success', 'Respon reschedule berhasil disimpan.');
     }
 }

@@ -48,4 +48,11 @@ class SidangJadwal extends Model
         // return $this->belongsTo(Ruangan::class);
         // Untuk sementara kita pakai kolom string 'lokasi' dulu sesuai migration
     }
+
+    public function proposal()
+    {
+        // Asumsi: di tabel sidang_jadwals ada kolom 'proposal_id'
+        // Jika tidak ada, gunakan relasi melalui mahasiswa_id
+        return $this->belongsTo(Proposal::class, 'mahasiswa_id', 'mahasiswa_id');
+    }
 }

@@ -37,19 +37,14 @@
         {{-- BAGIAN PROFIL USER --}}
         <div class="flex items-center gap-4">
             <div class="hidden md:block text-right">
-                {{-- 1. Nama User Dinamis --}}
                 <p class="font-semibold text-sm">{{ Auth::user()->name }}</p>
-                
-                {{-- 2. Role User Dinamis (Huruf Besar) --}}
                 <span class="inline-block bg-neutral-800 border border-neutral-600 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold text-gray-300">
                     {{ Auth::user()->role }}
                 </span>
             </div>
             
-            {{-- 3. Foto Profil Navigasi --}}
             <a href="{{ route('profile.index') }}" 
                class="w-10 h-10 rounded-full border-2 border-white/20 hover:border-blue-500 transition overflow-hidden cursor-pointer shadow-lg relative group">
-                
                 <img src="{{ Auth::user()->profile_photo_url }}" 
                      alt="{{ Auth::user()->name }}" 
                      class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
@@ -57,7 +52,7 @@
         </div>
     </div>
 
-    {{-- MAIN LAYOUT (SIDEBAR + CONTENT) --}}
+    {{-- MAIN LAYOUT --}}
     <div class="flex flex-1 overflow-hidden">
         
         {{-- SIDEBAR MENU --}}
@@ -68,79 +63,88 @@
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Menu Utama</p>
                 </div>
                 
-                {{-- MENU UMUM --}}
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-gray-50 hover:text-blue-600 transition group {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
                     <span class="text-lg group-hover:scale-110 transition">🏠</span>
                     <span class="text-sm font-medium">Dashboard</span>
                 </a>
 
-                {{-- =============================================== --}}
-                {{-- KHUSUS MAHASISWA                                --}}
-                {{-- =============================================== --}}
+                {{-- AREA MAHASISWA --}}
                 @if(Auth::user()->role == 'mahasiswa')
                     <div class="mt-6 mb-2 px-4">
                         <p class="text-xs font-bold text-blue-500 uppercase tracking-widest border-b border-blue-100 pb-1">Mahasiswa</p>
                     </div>
                     
-                    {{-- Status Proposal (Lihat Progres) --}}
                     <a href="{{ route('mahasiswa.proposal.status') }}" 
                        class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition group {{ request()->routeIs('mahasiswa.proposal.*') ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
                         <i class="fas fa-info-circle w-5 text-center text-lg group-hover:scale-110 transition"></i>
                         <span class="text-sm font-medium">Status Proposal</span>
                     </a>
 
-                    {{-- Jadwal Sidang Saya --}}
                     <a href="{{ route('mahasiswa.sidang.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition group {{ request()->routeIs('mahasiswa.sidang.*') ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
                         <span class="text-lg group-hover:scale-110 transition">📅</span> 
                         <span class="text-sm font-medium">Jadwal Sidang</span>
                     </a>
+
+                    <a href="{{ route('mahasiswa.dokumen.index') }}" 
+                       class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition group {{ request()->routeIs('mahasiswa.dokumen.*') ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
+                        <i class="fas fa-file-invoice w-5 text-center text-lg group-hover:scale-110 transition"></i>
+                        <span class="text-sm font-medium">Dokumen Administrasi TA</span>
+                    </a>  
                 @endif
 
-                {{-- =============================================== --}}
-                {{-- KHUSUS KOORDINATOR                               --}}
-                {{-- =============================================== --}}
+                {{-- AREA KOORDINATOR --}}
                 @if(Auth::user()->role == 'koordinator')
                     <div class="mt-6 mb-2 px-4">
                         <p class="text-xs font-bold text-red-500 uppercase tracking-widest border-b border-red-100 pb-1">Koordinator</p>
                     </div>
 
-                    {{-- Daftar Pengguna --}}
                     <a href="{{ route('koordinator.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition group {{ request()->routeIs('koordinator.users.*') ? 'bg-red-50 text-red-700 font-bold' : '' }}">
                         <span class="text-lg group-hover:scale-110 transition">👥</span> 
                         <span class="text-sm font-medium">Daftar Pengguna</span>
                     </a>
 
-                    {{-- Penetapan Dosen/TA --}}
                     <a href="{{ route('koordinator.penetapan.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition group {{ request()->routeIs('koordinator.penetapan.*') ? 'bg-red-50 text-red-700 font-bold' : '' }}">
                         <span class="text-lg group-hover:scale-110 transition">📝</span> 
                         <span class="text-sm font-medium">Penetapan Dosen</span>
                     </a>
                     
-                    {{-- Buat Jadwal Sidang (LINK DIPERBAIKI: ke koordinator.sidang.create) --}}
                     <a href="{{ route('koordinator.sidang.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition group {{ request()->routeIs('koordinator.sidang.*') ? 'bg-red-50 text-red-700 font-bold' : '' }}">
                         <span class="text-lg group-hover:scale-110 transition">📅</span> 
                         <span class="text-sm font-medium">Jadwal Sidang</span>
                     </a>
 
-                    {{-- Approval Reschedule --}}
                     <a href="{{ route('koordinator.approval') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition group {{ request()->routeIs('koordinator.approval') ? 'bg-red-50 text-red-700 font-bold' : '' }}">
                         <span class="text-lg group-hover:scale-110 transition">✅</span> 
                         <span class="text-sm font-medium">Approval Reschedule</span>
                     </a>
+
+                    <a href="{{ route('koordinator.monitoring.index') }}" 
+                    class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition group {{ request()->routeIs('koordinator.monitoring.index') ? 'bg-red-50 text-red-700 font-bold' : '' }}">
+                        <i class="fas fa-desktop w-5 text-center text-lg"></i>
+                        <span class="text-sm font-medium">Monitoring Administrasi</span>
+                    </a>
+
+                    <a href="{{ route('koordinator.monitoring.statistik') }}" 
+                       class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition group {{ request()->routeIs('koordinator.monitoring.statistik') ? 'bg-red-50 text-red-700 font-bold' : '' }}">
+                        <i class="fas fa-chart-pie w-5 text-center text-lg group-hover:scale-110 transition"></i>
+                        <span class="text-sm font-medium">Statistik TA</span>
+                    </a>
+
+                    <a href="{{ route('koordinator.riwayat.index') }}" 
+                    class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition group {{ request()->routeIs('koordinator.riwayat.*') || request()->routeIs('koordinator.monitoring.timeline') ? 'bg-red-50 text-red-700 font-bold' : '' }}">
+                        <i class="fas fa-history w-5 text-center text-lg group-hover:rotate-[-20deg] transition"></i>
+                        <span class="text-sm font-medium">Log Riwayat TA</span>
+                    </a>
                 @endif
 
-                {{-- =============================================== --}}
-                {{-- KHUSUS DOSEN                                     --}}
-                {{-- =============================================== --}}
+                {{-- AREA DOSEN --}}
                 @if(Auth::user()->role == 'dosen')
                     <div class="mt-6 mb-2 px-4">
                         <p class="text-xs font-bold text-green-600 uppercase tracking-widest border-b border-green-100 pb-1">Dosen</p>
                     </div>
 
-                    {{-- Permintaan Masuk (Dengan Badge) --}}
                     @php
-                        // Hitung permintaan pending (pastikan Model DosenRequest ada/sesuai)
                         $pendingCount = 0;
                         if(class_exists('App\Models\DosenRequest')) {
                             $pendingCount = App\Models\DosenRequest::where('dosen_id', Auth::id())->where('status', 'pending')->count();
@@ -152,43 +156,42 @@
                             <span class="text-lg group-hover:scale-110 transition">📩</span> 
                             <span class="text-sm font-medium">Permintaan Masuk</span>
                         </div>
-                        
                         @if($pendingCount > 0)
-                            <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-sm">
-                                {{ $pendingCount }}
-                            </span>
+                            <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-sm">{{ $pendingCount }}</span>
                         @endif
                     </a>
 
-                    {{-- Monitoring Bimbingan --}}
                     <a href="{{ route('dosen.monitoring.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-green-50 hover:text-green-600 transition group {{ request()->routeIs('dosen.monitoring.*') ? 'bg-green-50 text-green-700 font-bold' : '' }}">
                         <span class="text-lg group-hover:scale-110 transition">👀</span> 
                         <span class="text-sm font-medium">Monitoring</span>
                     </a>
 
-                    {{-- Bimbingan Saya (Mahasiswa Bimbingan) --}}
                     <a href="{{ route('dosen.bimbingan.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-green-50 hover:text-green-600 transition group {{ request()->routeIs('dosen.bimbingan.*') ? 'bg-green-50 text-green-700 font-bold' : '' }}">
-                        <div class="w-5 text-center text-lg group-hover:scale-110 transition">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
+                        <i class="fas fa-chalkboard-teacher w-5 text-center text-lg group-hover:scale-110 transition"></i>
                         <span class="text-sm font-medium">Bimbingan Saya</span>
                     </a>
 
-                    {{-- Jadwal Menguji --}}
                     <a href="{{ route('dosen.penguji.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-green-50 hover:text-green-600 transition group {{ request()->routeIs('dosen.penguji.*') ? 'bg-green-50 text-green-700 font-bold' : '' }}">
-                        <div class="w-5 text-center text-lg group-hover:scale-110 transition">
-                            <i class="fas fa-clipboard-check"></i>
-                        </div>
+                        <i class="fas fa-clipboard-check w-5 text-center text-lg group-hover:scale-110 transition"></i>
                         <span class="text-sm font-medium">Daftar Menguji</span>
                     </a>
+                    
+                    <a href="{{ route('dosen.sidang.index') }}" 
+                       class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition group {{ request()->routeIs('dosen.sidang.*') ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
+                        <span class="text-lg group-hover:scale-110 transition">📅</span> 
+                        <span class="text-sm font-medium">Jadwal Sidang</span>
+                    </a>
 
+                    <a href="{{ route('dosen.validasi.index') }}" 
+                       class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-green-50 hover:text-green-600 transition group {{ request()->routeIs('dosen.validasi.*') ? 'bg-green-50 text-green-700 font-bold' : '' }}">
+                        <i class="fas fa-user-check w-5 text-center text-lg group-hover:scale-110 transition"></i>
+                        <span class="text-sm font-medium">Validasi Dokumen TA</span>
+                    </a>
                 @endif
-
             </nav>
 
-            {{-- Logout Button --}}
             <div class="mt-auto p-4 border-t border-gray-100 bg-gray-50/50">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -202,31 +205,21 @@
 
         {{-- MAIN CONTENT AREA --}}
         <main class="flex-1 overflow-y-auto h-screen pb-20 bg-gray-100">
-            {{-- Container Utama --}}
             <div class="p-6 md:p-8 max-w-7xl mx-auto">
-                
-                {{-- Header Halaman (Opsional) --}}
                 @if (isset($header))
                     <header class="bg-white shadow-sm mb-8 rounded-2xl p-6 border border-gray-100">
                         {{ $header }}
                     </header>
                 @endif
 
-                {{-- Konten Dinamis --}}
                 <div class="animate-fade-in-up">
-                    {{-- 1. Cek apakah ada $slot (Untuk halaman Component baru) --}}
                     {{ $slot ?? '' }}
-
-                    {{-- 2. Jika tidak ada $slot, ambil dari @yield (Untuk halaman Dashboard lama) --}}
                     @yield('content')
                 </div>
-
             </div>
         </main>
-
     </div>
 
-    {{-- Animasi Fade In sederhana --}}
     <style>
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
@@ -236,6 +229,5 @@
             animation: fadeInUp 0.4s ease-out forwards;
         }
     </style>
-
 </body>
 </html>

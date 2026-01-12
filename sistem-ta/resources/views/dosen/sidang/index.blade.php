@@ -1,131 +1,102 @@
 <x-app-layout title="Jadwal Sidang & Request">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Sidang') }}
+            {{ __('Dashboard Sidang Dosen') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12" x-data="{ openModal: false, mhsName: '', actionUrl: '' }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             
-            {{-- BAGIAN 1: NOTIFIKASI PENGAJUAN PERUBAHAN (Hanya muncul jika ada request) --}}
-            @if($pengajuans->count() > 0)
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg shadow-md">
-                    <div class="flex items-center mb-4">
-                        <i class="fas fa-bell text-yellow-600 text-2xl mr-3"></i>
-                        <h3 class="text-lg font-bold text-yellow-800">
-                            Ada {{ $pengajuans->count() }} Permintaan Perubahan Jadwal
-                        </h3>
-                    </div>
-
-                    <div class="grid gap-4">
-                        @foreach($pengajuans as $p)
-                            <div class="bg-white p-4 rounded-md shadow-sm border border-yellow-200 flex flex-col md:flex-row justify-between items-center gap-4">
-                                
-                                {{-- Info Request --}}
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-bold text-gray-800">{{ $p->sidang->mahasiswa->name }}</span>
-                                        <span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">
-                                            {{ $p->sidang->jenis_sidang }}
-                                        </span>
-                                    </div>
-                                    <p class="text-sm text-gray-600">
-                                        <span class="line-through text-red-400 mr-2">
-                                            {{ $p->sidang->tanggal }} ({{ $p->sidang->jam_mulai }})
-                                        </span>
-                                        <i class="fas fa-arrow-right text-gray-400 mx-1"></i>
-                                        <span class="font-bold text-green-600">
-                                            {{ $p->tanggal_saran }} ({{ $p->jam_saran }})
-                                        </span>
-                                    </p>
-                                    <p class="text-sm italic text-gray-500 mt-1">
-                                        "{{ $p->alasan }}"
-                                    </p>
-                                </div>
-
-                                {{-- Tombol Aksi --}}
-                                <div class="flex items-center gap-2">
-                                    {{-- Form Terima --}}
-                                    <form action="{{ route('dosen.sidang.proses_pengajuan', $p->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="keputusan" value="terima">
-                                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-bold transition">
-                                            <i class="fas fa-check mr-1"></i> Setuju
-                                        </button>
-                                    </form>
-
-                                    {{-- Form Tolak --}}
-                                    <form action="{{ route('dosen.sidang.proses_pengajuan', $p->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="keputusan" value="tolak">
-                                        <button type="submit" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm font-bold transition">
-                                            <i class="fas fa-times mr-1"></i> Tolak
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+            {{-- Alert Notifikasi --}}
+            @if(session('success'))
+                <div class="bg-green-100 border-l-4 border-green-500 p-4 text-green-700 shadow-sm rounded">
+                    {{ session('success') }}
                 </div>
             @endif
 
-            {{-- BAGIAN 2: DAFTAR JADWAL SIDANG SAYA --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-gray-800">Jadwal Menguji Saya</h3>
-                        {{-- Tombol buat manual jika perlu --}}
-                        <a href="{{ route('dosen.sidang.create') }}" class="text-sm text-blue-600 hover:underline">
-                            + Buat Jadwal Manual
-                        </a>
-                    </div>
+            {{-- Menampilkan Error Validasi (Misal file terlalu besar) --}}
+            @if ($errors->any())
+                <div class="bg-red-100 border-l-4 border-red-500 p-4 text-red-700 shadow-sm rounded">
+                    <ul class="list-disc ml-5 text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                    @if($jadwals->isEmpty())
-                        <p class="text-center text-gray-500 py-8">Belum ada jadwal sidang.</p>
-                    @else
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal & Jam</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mahasiswa</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Judul TA</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lokasi</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($jadwals as $jadwal)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $jadwal->tanggal }} <br>
+            {{-- SECTION 2: DAFTAR JADWAL MENGUJI --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border border-gray-100">
+                <div class="p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-calendar-alt mr-2 text-blue-600"></i> Jadwal Menguji Saya
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Waktu</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Mahasiswa</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                @foreach($jadwals as $jadwal)
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 text-sm">
+                                            <span class="font-bold text-gray-900">{{ \Carbon\Carbon::parse($jadwal->tanggal)->format('d M Y') }}</span><br>
                                             <span class="text-gray-500">{{ $jadwal->jam_mulai }} - {{ $jadwal->jam_selesai }}</span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ $jadwal->mahasiswa->name ?? '-' }}
+                                        <td class="px-6 py-4 text-sm text-gray-700 font-medium">
+                                            {{ $jadwal->mahasiswa->name }}
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500">
-                                            {{ Str::limit($jadwal->judul_ta, 30) }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $jadwal->lokasi }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                {{ $jadwal->status == 'dijadwalkan' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                                {{ ucfirst($jadwal->status) }}
-                                            </span>
+                                        <td class="px-6 py-4 text-center">
+                                            <button @click="openModal = true; mhsName = '{{ $jadwal->mahasiswa->name }}'; actionUrl = '{{ route('dosen.sidang.ajukan_perubahan', $jadwal->id) }}'" 
+                                                class="inline-flex items-center text-amber-600 hover:text-amber-800 text-sm font-bold bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100 transition">
+                                                <i class="fas fa-exchange-alt mr-2"></i> Reschedule
+                                            </button>
                                         </td>
                                     </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+        </div>
 
+        {{-- MODAL RESCHEDULE --}}
+        <div x-show="openModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4" x-cloak>
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl transform transition-all" @click.away="openModal = false">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">Ajukan Perubahan</h3>
+                    <button @click="openModal = false" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                </div>
+                <p class="text-sm text-gray-500 mb-6 italic">Mahasiswa: <span x-text="mhsName" class="font-bold text-gray-800 not-italic"></span></p>
+                
+                <form :action="actionUrl" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    @csrf
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Alasan Berhalangan</label>
+                        <textarea name="alasan" rows="3" required placeholder="Contoh: Menghadiri Konferensi / Tugas Luar Kota..." 
+                            class="w-full border-gray-300 rounded-xl text-sm focus:ring-amber-500 focus:border-amber-500 shadow-sm"></textarea>
+                    </div>
+                    
+                    <div class="p-4 bg-blue-50 rounded-xl border-2 border-dashed border-blue-200">
+                        <label class="block text-xs font-bold text-blue-800 mb-2 uppercase tracking-wide">Lampirkan Surat Tugas (PDF/JPG)</label>
+                        <input type="file" name="surat_kerja" required class="text-xs block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition">
+                        <p class="mt-2 text-[10px] text-blue-600 italic">*Wajib untuk memvalidasi permintaan Anda ke Koordinator.</p>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                        <button type="button" @click="openModal = false" class="px-4 py-2 text-sm font-medium text-gray-500">Batal</button>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-blue-700 transition flex items-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Kirim Request
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </x-app-layout>

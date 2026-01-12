@@ -14,10 +14,10 @@ class RequestController extends Controller
     public function index()
     {
         $requests = DosenRequest::with(['proposal.mahasiswa'])
-                    ->where('dosen_id', Auth::id())
-                    ->where('status', 'pending') // Hanya tampilkan yang belum dijawab
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+            ->where('dosen_id', Auth::id())
+            ->where('status', 'pending') // Hanya tampilkan yang belum dijawab
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('dosen.request.index', compact('requests'));
     }
@@ -26,35 +26,36 @@ class RequestController extends Controller
     public function respond(Request $request, $id)
     {
         $dosenRequest = DosenRequest::findOrFail($id);
-        
-        // Validasi keamanan: Pastikan yang jawab adalah dosen yang dituju
-        if($dosenRequest->dosen_id != Auth::id()) {
+
+        if ($dosenRequest->dosen_id != Auth::id()) {
             abort(403);
         }
 
         if ($request->action == 'terima') {
-            // 1. Update status Request jadi Accepted
             $dosenRequest->update(['status' => 'accepted']);
 
-            // 2. UPDATE TABEL UTAMA PROPOSALS (Resmi ditetapkan)
             $proposal = Proposal::findOrFail($dosenRequest->proposal_id);
-            
+
+            // LOGIKA PENERIMAAN BERDASARKAN ROLE
             if ($dosenRequest->role == 'pembimbing') {
                 $proposal->update(['dosen_pembimbing_id' => Auth::id()]);
-            } elseif ($dosenRequest->role == 'penguji_1') {
+            }
+            // Gunakan str_contains atau regex agar mencakup penguji_1, penguji_2, dst.
+            elseif (str_contains($dosenRequest->role, 'penguji')) {
+                // Update dosen_penguji_id pada tabel proposal (sebagai penguji utama/perwakilan)
+                // Atau jika Anda punya kolom spesifik seperti dosen_penguji_2, silakan sesuaikan
                 $proposal->update(['dosen_penguji_id' => Auth::id()]);
             }
 
             return back()->with('success', 'Anda berhasil menerima permintaan ini.');
-        } 
-        
+        }
+
         if ($request->action == 'tolak') {
             $dosenRequest->update([
                 'status' => 'rejected',
                 'pesan_penolakan' => $request->alasan ?? 'Tidak bersedia saat ini.'
             ]);
-            
-            // Proposal ID tidak diupdate (tetap null), Koordinator akan melihat status rejected
+
             return back()->with('success', 'Permintaan ditolak.');
         }
     }

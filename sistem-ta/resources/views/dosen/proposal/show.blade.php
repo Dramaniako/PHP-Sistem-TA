@@ -100,31 +100,6 @@
                                             <p class="text-xs text-gray-600"><i class="fas fa-map-marker-alt mr-1"></i> {{ $jadwal->tempat }}</p>
                                             <p class="text-xs text-gray-500 mt-1 italic">Topik: "{{ $jadwal->topik }}"</p>
                                         </div>
-
-                                        {{-- AKSI DOSEN (Jika ada request reschedule) --}}
-                                        @if($jadwal->status == 'pengajuan_reschedule')
-                                            <div class="bg-orange-50 p-3 rounded-lg border border-orange-200 w-full md:w-auto">
-                                                <p class="text-[10px] font-bold text-orange-800 uppercase mb-1">Permintaan Perubahan</p>
-                                                <p class="text-xs text-gray-700 mb-2">
-                                                    Baru: <strong>{{ $jadwal->waktu_reschedule->translatedFormat('d M Y, H:i') }}</strong><br>
-                                                    Alasan: "{{ $jadwal->alasan_reschedule }}"
-                                                </p>
-                                                <div class="flex gap-2">
-                                                    {{-- Form Terima --}}
-                                                    <form action="{{ route('dosen.proposal.jadwal.respon', $jadwal->id) }}" method="POST">
-                                                        @csrf @method('PUT')
-                                                        <input type="hidden" name="keputusan" value="terima">
-                                                        <button class="bg-green-600 text-white text-xs px-3 py-1 rounded font-bold hover:bg-green-700">Terima</button>
-                                                    </form>
-                                                    {{-- Form Tolak --}}
-                                                    <form action="{{ route('dosen.proposal.jadwal.respon', $jadwal->id) }}" method="POST">
-                                                        @csrf @method('PUT')
-                                                        <input type="hidden" name="keputusan" value="tolak">
-                                                        <button class="bg-red-600 text-white text-xs px-3 py-1 rounded font-bold hover:bg-red-700">Tolak</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        @endif
                                     </div>
                                 </div>
                             @empty
